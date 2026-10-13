@@ -1,0 +1,12 @@
+**/node_modules
+**/.next
+**/dist
+**/.strapi
+**/.env
+**/.env.*
+!**/.env.example
+backend/public/uploads
+backend/scripts/.webflow-cache
+backend/.tmp
+.git
+**/.DS_Store
