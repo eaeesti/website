@@ -43,6 +43,7 @@ scripts/                # one-off imports from the old Webflow site, via the RES
 - **i18n**: `page` and `global` are localized (`et` default, `en`). The blog types are not.
 - **Rich text** fields use the Blocks editor (`"type": "blocks"`), never Markdown.
 - **Admin labels**: `src/admin-fields.ts` sets every field's label and help text in the content manager on each boot, overwriting edits made under "Configure the view". Add a hint there when you add a field whose purpose isn't obvious from its name.
+- **Editor role**: `src/editor-role.ts` rebuilds the Editor role's permissions on each boot: all content in every language and field, media without deleting, contact messages; no Email settings or admin settings. Edits to the role in the admin are overwritten.
 - **Scripts don't restart `pnpm dev`**: `scripts/` is in `watchIgnoreFiles` (config/admin.js), so imports can run against the dev server while you edit them.
 - **Everything in Strapi is in English**: display names, descriptions, field defaults, messages. Only content in the `et` locale is Estonian. Frontend type names come from the UID, so renaming a display name is safe; renaming a file or attribute is not.
 

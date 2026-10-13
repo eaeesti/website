@@ -2,6 +2,7 @@ import type { Core } from "@strapi/strapi";
 import fs from "fs";
 import path from "path";
 import { syncAdminFields } from "./admin-fields";
+import { syncEditorRole } from "./editor-role";
 import {
   affectsPublicSite,
   scheduleFrontendRevalidation,
@@ -268,6 +269,7 @@ export default {
     await safely(strapi, "bootstrapApiToken", () => bootstrapApiToken(strapi));
     await safely(strapi, "hardenPublicAuth", () => hardenPublicAuth(strapi));
     await safely(strapi, "syncAdminFields", () => syncAdminFields(strapi));
+    await safely(strapi, "syncEditorRole", () => syncEditorRole(strapi));
     warnIfProxyUntrusted(strapi);
     warnIfRevalidationUnset(strapi);
 
