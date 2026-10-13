@@ -47,27 +47,29 @@ export default function Anchor({
  * The link's text and the external link icon. The icon must not wrap onto
  * a line of its own, so it shares a non-breaking span with the last word
  * (when the text is a plain string) and a word joiner with what follows.
+ * Everything is inside one span: in a flex link (buttons, menus) each loose
+ * text node would become a flex item, losing the space before the last word.
  */
 function WithIcon({ children }: { children: ReactNode }) {
   if (typeof children === "string") {
     const split = children.trimEnd().lastIndexOf(" ");
     return (
-      <>
+      <span>
         {children.slice(0, split + 1)}
         <span className="whitespace-nowrap">
           {children.slice(split + 1).trimEnd()}
           <ExternalLinkIcon />
         </span>
         {"\u2060"}
-      </>
+      </span>
     );
   }
   return (
-    <>
+    <span>
       {children}
       {"\u2060"}
       <ExternalLinkIcon />
       {"\u2060"}
-    </>
+    </span>
   );
 }
