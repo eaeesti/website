@@ -1,0 +1,32 @@
+{
+  "collectionName": "components_sections_newsletter_sections",
+  "info": {
+    "displayName": "Newsletter",
+    "icon": "envelop",
+    "description": "A newsletter signup band; the signup form loads only when someone clicks the button"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "text": {
+      "type": "blocks"
+    },
+    "buttonText": {
+      "type": "string",
+      "required": true,
+      "default": "Subscribe"
+    },
+    "formUrl": {
+      "type": "string",
+      "required": true
+    },
+    "formHeight": {
+      "type": "integer",
+      "default": 420,
+      "min": 200,
+      "max": 1200
+    }
+  }
+}

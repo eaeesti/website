@@ -1,0 +1,21 @@
+{
+  "name": "efektiivnealtruism",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Efektiivne Altruism Eesti website",
+  "license": "AGPL-3.0-or-later",
+  "scripts": {
+    "dev": "pnpm --recursive --parallel dev",
+    "generate-types": "node scripts/generate-strapi-types.mjs",
+    "test": "pnpm --recursive test",
+    "type-check": "pnpm --recursive type-check",
+    "lint": "oxlint",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check"
+  },
+  "devDependencies": {
+    "oxfmt": "^0.72.0",
+    "oxlint": "^1.87.0"
+  },
+  "packageManager": "pnpm@12.12.1"
+}

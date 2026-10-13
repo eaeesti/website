@@ -1,0 +1,14 @@
+{
+  "collectionName": "components_sections_text_section",
+  "info": {
+    "displayName": "Text",
+    "icon": "feather",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "text": {
+      "type": "blocks"
+    }
+  }
+}

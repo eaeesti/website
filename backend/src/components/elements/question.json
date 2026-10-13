@@ -1,0 +1,21 @@
+{
+  "collectionName": "components_elements_question",
+  "info": {
+    "displayName": "Question",
+    "icon": "question",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "question": {
+      "type": "string",
+      "required": true
+    },
+    "answer": {
+      "type": "blocks"
+    },
+    "plausibleEvent": {
+      "type": "string"
+    }
+  }
+}

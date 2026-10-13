@@ -1,0 +1,17 @@
+{
+  "collectionName": "components_elements_donation_amounts",
+  "info": {
+    "displayName": "Donation amount",
+    "icon": "priceTag",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "amount": {
+      "type": "integer",
+      "required": true,
+      "min": 1,
+      "max": 15000
+    }
+  }
+}

@@ -1,0 +1,105 @@
+@import "tailwindcss";
+@import "@fontsource-variable/raleway";
+@import "@fontsource/merriweather/300.css";
+@import "@fontsource/merriweather/300-italic.css";
+@import "@fontsource/merriweather/400.css";
+
+@plugin "@tailwindcss/typography";
+@plugin "@tailwindcss/forms";
+
+/*
+ * Starting point taken from the old Webflow site: Raleway for text and
+ * headings, Merriweather for subtitles and quotes, and the EA blues.
+ */
+@theme {
+  --font-sans: "Raleway Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Merriweather", ui-serif, Georgia, serif;
+
+  --color-primary-50: #f0f7ff;
+  --color-primary-100: #e0effe;
+  --color-primary-200: #b9dffe;
+  --color-primary-300: #7cc5fd;
+  --color-primary-400: #36a9fa;
+  --color-primary-500: #0c8eeb;
+  --color-primary-600: #0072ce;
+  --color-primary-700: #0158a3;
+  --color-primary-800: #0b3f6f;
+  --color-primary-900: #003366;
+  --color-primary-950: #00213f;
+}
+
+/* Rich text colours for BlocksContent ("prose prose-ea"). */
+@utility prose-ea {
+  --tw-prose-body: var(--color-slate-700);
+  --tw-prose-headings: var(--color-primary-800);
+  --tw-prose-links: var(--color-primary-600);
+  --tw-prose-bold: var(--color-slate-900);
+  --tw-prose-quotes: var(--color-primary-900);
+  --tw-prose-quote-borders: var(--color-primary-200);
+  --tw-prose-bullets: var(--color-primary-300);
+  --tw-prose-counters: var(--color-primary-700);
+  --tw-prose-captions: var(--color-slate-500);
+
+  /* Typography leaves the smallest headings looking like paragraphs. */
+  & :where(h5, h6):not(:where(.not-prose *)) {
+    margin-top: 1.6em;
+    margin-bottom: 0.5em;
+    font-weight: 700;
+    color: var(--tw-prose-headings);
+  }
+}
+
+/* The same on dark backgrounds (photo headers, call-to-action bands). */
+@utility prose-ea-invert {
+  --tw-prose-body: var(--color-primary-50);
+  --tw-prose-headings: var(--color-white);
+  --tw-prose-links: var(--color-white);
+  --tw-prose-bold: var(--color-white);
+  --tw-prose-quotes: var(--color-white);
+  --tw-prose-quote-borders: var(--color-primary-300);
+  --tw-prose-bullets: var(--color-primary-200);
+  --tw-prose-counters: var(--color-primary-200);
+  --tw-prose-captions: var(--color-primary-200);
+}
+
+@layer base {
+  :root {
+    /* The navbar's height at the top of the page (logo plus padding). */
+    --nav-height: 4rem;
+    @media (width >= 64rem) {
+      --nav-height: 5.875rem;
+    }
+  }
+
+  :focus-visible {
+    outline-color: var(--color-primary-600);
+  }
+
+  /* Tailwind 4 leaves buttons with the default arrow. */
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
+/* The "@" of an email address shown as text (Email.tsx). */
+.email-at::before {
+  content: "[ät]";
+}
+:lang(en) .email-at::before {
+  content: "[at]";
+}
+
+/*
+ * The navbar is transparent over a page's dark header (marked
+ * `data-nav-overlay`, which leaves room for it). Pages that start with
+ * anything else get a solid navbar and start below it.
+ */
+body:not(:has(main > [data-nav-overlay]:first-child)) {
+  & .site-nav {
+    background-color: var(--color-primary-800);
+  }
+  & main {
+    padding-top: var(--nav-height);
+  }
+}

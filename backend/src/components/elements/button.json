@@ -1,0 +1,40 @@
+{
+  "collectionName": "components_elements_button",
+  "info": {
+    "displayName": "Button",
+    "icon": "cursor",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "text": {
+      "type": "string",
+      "required": true
+    },
+    "href": {
+      "type": "string",
+      "required": true
+    },
+    "type": {
+      "type": "enumeration",
+      "enum": ["primary", "secondary", "white", "outline", "text"],
+      "default": "primary"
+    },
+    "size": {
+      "type": "enumeration",
+      "enum": ["sm", "md", "lg"],
+      "default": "md"
+    },
+    "arrow": {
+      "type": "boolean",
+      "default": false
+    },
+    "newTab": {
+      "type": "boolean",
+      "default": false
+    },
+    "plausibleEvent": {
+      "type": "string"
+    }
+  }
+}

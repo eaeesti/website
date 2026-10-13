@@ -1,0 +1,13 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "printWidth": 80,
+  "sortTailwindcss": {
+    "stylesheet": "./frontend/src/app/globals.css",
+    "functions": ["classes", "buttonClasses"]
+  },
+  "ignorePatterns": [
+    "backend/types/generated/**",
+    "frontend/src/types/generated/**",
+    "backend/public/**"
+  ]
+}

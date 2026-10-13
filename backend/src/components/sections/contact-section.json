@@ -1,0 +1,44 @@
+{
+  "collectionName": "components_sections_contact_section",
+  "info": {
+    "displayName": "Contact form",
+    "icon": "envelop",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "blocks"
+    },
+    "contactEmail": {
+      "type": "email"
+    },
+    "nameLabel": {
+      "type": "string",
+      "default": "Name"
+    },
+    "emailLabel": {
+      "type": "string",
+      "default": "Email"
+    },
+    "messageLabel": {
+      "type": "string",
+      "default": "Message"
+    },
+    "sendLabel": {
+      "type": "string",
+      "default": "Send"
+    },
+    "successTitle": {
+      "type": "string",
+      "default": "Thanks, your message was sent!"
+    },
+    "successDescription": {
+      "type": "text",
+      "default": "We'll get back to you as soon as we can."
+    }
+  }
+}

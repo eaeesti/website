@@ -1,0 +1,49 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["eslint", "typescript", "unicorn", "oxc", "import", "node"],
+  "categories": {
+    "correctness": "error",
+    "suspicious": "warn",
+  },
+  "env": {
+    "node": true,
+    "es2024": true,
+  },
+  "ignorePatterns": [
+    "**/dist/**",
+    "**/.next/**",
+    "**/.strapi/**",
+    "**/types/generated/**",
+    "backend/public/**",
+    "backend/scripts/.webflow-cache/**",
+  ],
+  "rules": {
+    "eqeqeq": "error",
+    "typescript/no-explicit-any": "error",
+    "typescript/no-non-null-assertion": "error",
+    // Strapi's dynamic zones identify components by `__component`.
+    "no-underscore-dangle": "off",
+    // Stylesheets and `import "server-only"` are imported for their effect.
+    "import/no-unassigned-import": "off",
+  },
+  "overrides": [
+    {
+      "files": ["frontend/**"],
+      "plugins": ["react", "react-perf", "jsx-a11y", "nextjs"],
+      "env": { "browser": true },
+      "rules": {
+        "react/rules-of-hooks": "error",
+        "react/exhaustive-deps": "warn",
+        // The automatic JSX runtime (React 17+) doesn't need React in scope.
+        "react/react-in-jsx-scope": "off",
+        // Tailwind's list-none drops list semantics in Safari/VoiceOver;
+        // role="list" puts them back.
+        "jsx-a11y/no-redundant-roles": "off",
+      },
+    },
+    {
+      "files": ["**/__tests__/**", "**/*.test.*"],
+      "plugins": ["vitest"],
+    },
+  ],
+}

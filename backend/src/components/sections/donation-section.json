@@ -1,0 +1,103 @@
+{
+  "collectionName": "components_sections_donation_sections",
+  "info": {
+    "displayName": "Donation form",
+    "icon": "heart",
+    "description": "Donations go through Anneta Targalt."
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "blocks"
+    },
+    "defaultFrequency": {
+      "type": "enumeration",
+      "enum": ["recurring", "onetime"],
+      "default": "recurring"
+    },
+    "recurringLabel": {
+      "type": "string",
+      "default": "Monthly donation"
+    },
+    "onetimeLabel": {
+      "type": "string",
+      "default": "One-time donation"
+    },
+    "amounts": {
+      "type": "component",
+      "repeatable": true,
+      "component": "elements.donation-amount"
+    },
+    "otherAmountLabel": {
+      "type": "string",
+      "default": "Other amount"
+    },
+    "customAmountLabel": {
+      "type": "string",
+      "default": "Amount (EUR)"
+    },
+    "firstNameLabel": {
+      "type": "string",
+      "default": "First name"
+    },
+    "lastNameLabel": {
+      "type": "string",
+      "default": "Last name"
+    },
+    "emailLabel": {
+      "type": "string",
+      "default": "Email"
+    },
+    "idCodeLabel": {
+      "type": "string",
+      "default": "Personal ID code"
+    },
+    "idCodeDescription": {
+      "type": "string"
+    },
+    "bankLabel": {
+      "type": "string",
+      "default": "Bank"
+    },
+    "otherBankLabel": {
+      "type": "string",
+      "default": "Other bank"
+    },
+    "companyLabel": {
+      "type": "string",
+      "default": "I'm donating on behalf of a company"
+    },
+    "companyNameLabel": {
+      "type": "string",
+      "default": "Company name"
+    },
+    "companyCodeLabel": {
+      "type": "string",
+      "default": "Registry code"
+    },
+    "submitLabel": {
+      "type": "string",
+      "default": "Donate"
+    },
+    "invalidIdCodeText": {
+      "type": "string",
+      "default": "Check your personal ID code."
+    },
+    "invalidAmountText": {
+      "type": "string",
+      "default": "Enter an amount between 1 and 15 000 euros."
+    },
+    "otherBankInstructions": {
+      "type": "blocks"
+    },
+    "returnPath": {
+      "type": "string",
+      "required": true,
+      "default": "/annetatud",
+      "regex": "^/[a-z0-9/-]*$"
+    }
+  }
+}

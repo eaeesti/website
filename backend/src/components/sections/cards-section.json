@@ -1,0 +1,22 @@
+{
+  "collectionName": "components_sections_cards_section",
+  "info": {
+    "displayName": "Cards",
+    "icon": "grid",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "text"
+    },
+    "cards": {
+      "type": "component",
+      "repeatable": true,
+      "component": "elements.card"
+    }
+  }
+}

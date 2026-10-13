@@ -1,0 +1,27 @@
+{
+  "collectionName": "components_sections_embed_section",
+  "info": {
+    "displayName": "Embed",
+    "icon": "code",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "url": {
+      "type": "string",
+      "required": true
+    },
+    "height": {
+      "type": "integer",
+      "default": 600,
+      "min": 100,
+      "max": 2000
+    },
+    "caption": {
+      "type": "text"
+    }
+  }
+}

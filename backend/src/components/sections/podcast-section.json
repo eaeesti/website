@@ -1,0 +1,26 @@
+{
+  "collectionName": "components_sections_podcast_sections",
+  "info": {
+    "displayName": "Podcast episodes",
+    "icon": "headphone",
+    "description": "Episodes from a podcast's RSS feed, newest first"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "rssUrl": {
+      "type": "string",
+      "required": true
+    },
+    "listenText": {
+      "type": "string",
+      "default": "Listen on Spotify"
+    },
+    "showMoreText": {
+      "type": "string",
+      "default": "Show more episodes"
+    }
+  }
+}

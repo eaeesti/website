@@ -1,0 +1,28 @@
+{
+  "collectionName": "components_elements_social_media_link",
+  "info": {
+    "displayName": "Social media link",
+    "icon": "earth",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "type": {
+      "type": "enumeration",
+      "enum": [
+        "facebook",
+        "instagram",
+        "linkedin",
+        "youtube",
+        "tiktok",
+        "x",
+        "github",
+        "spotify"
+      ]
+    },
+    "href": {
+      "type": "string",
+      "required": true
+    }
+  }
+}

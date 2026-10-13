@@ -1,0 +1,22 @@
+{
+  "collectionName": "components_sections_cta_section",
+  "info": {
+    "displayName": "Call to action",
+    "icon": "bell",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "blocks"
+    },
+    "buttons": {
+      "type": "component",
+      "repeatable": true,
+      "component": "elements.button"
+    }
+  }
+}

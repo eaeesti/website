@@ -1,0 +1,27 @@
+{
+  "collectionName": "components_meta_navbar",
+  "info": {
+    "displayName": "Navbar",
+    "icon": "layout",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "logo": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
+    "links": {
+      "type": "component",
+      "repeatable": true,
+      "component": "elements.nav-item"
+    },
+    "ctaButton": {
+      "type": "component",
+      "repeatable": false,
+      "component": "elements.button"
+    }
+  }
+}

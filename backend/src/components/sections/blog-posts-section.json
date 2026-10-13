@@ -1,0 +1,33 @@
+{
+  "collectionName": "components_sections_blog_posts_section",
+  "info": {
+    "displayName": "Blog posts",
+    "icon": "book",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "postsPerPage": {
+      "type": "integer",
+      "default": 12,
+      "min": 1,
+      "max": 50
+    },
+    "showPagination": {
+      "type": "boolean",
+      "default": true
+    },
+    "showCategories": {
+      "type": "boolean",
+      "default": false
+    },
+    "allPostsButton": {
+      "type": "component",
+      "repeatable": false,
+      "component": "elements.button"
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "collectionName": "components_meta_not_found_page",
+  "info": {
+    "displayName": "Not found page",
+    "icon": "emotionUnhappy",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "blocks"
+    },
+    "buttons": {
+      "type": "component",
+      "repeatable": true,
+      "component": "elements.button"
+    }
+  }
+}

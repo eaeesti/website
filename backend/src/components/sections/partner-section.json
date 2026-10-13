@@ -1,0 +1,20 @@
+{
+  "collectionName": "components_sections_partner_sections",
+  "info": {
+    "displayName": "Badge",
+    "icon": "star",
+    "description": "A round badge or seal next to a short text, e.g. the good fundraising practice badge"
+  },
+  "options": {},
+  "attributes": {
+    "text": {
+      "type": "blocks"
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "required": true,
+      "allowedTypes": ["images"]
+    }
+  }
+}

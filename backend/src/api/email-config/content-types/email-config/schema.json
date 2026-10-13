@@ -1,0 +1,23 @@
+{
+  "kind": "singleType",
+  "collectionName": "email_configs",
+  "info": {
+    "singularName": "email-config",
+    "pluralName": "email-configs",
+    "displayName": "Email settings",
+    "description": "Who receives contact form messages."
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "contactRecipients": {
+      "type": "text"
+    },
+    "contactSubject": {
+      "type": "string",
+      "default": "New message from the website contact form"
+    }
+  }
+}
