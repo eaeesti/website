@@ -52,6 +52,7 @@ src/
 - Routes return `[]` from `generateStaticParams`, so the build never contacts Strapi and pages are rendered and cached on first visit. Don't use `searchParams`, `cookies()` or `headers()` in pages: they make the route dynamic and turn off caching. Pagination is in the path (`/lk/2`) for this reason.
 - In draft mode (`draftMode()`), fetches skip the cache and request `status=draft` for content types that have drafts (`hasDrafts: true`).
 - Strapi runs on the same machine; the server reaches it at `STRAPI_URL` (loopback). Browsers only call Strapi for the contact form (`NEXT_PUBLIC_STRAPI_URL`).
+- Two sections read other sites' feeds on the server, cached on their own timers: the podcast's RSS (`utils/podcast.ts`, an hour) and the public Google Calendar (`utils/calendar.ts`, 15 minutes; repeating events are expanded with ical.js, times shown in Tallinn).
 - Uploaded images are served from `/uploads/…`, which `next.config.ts` rewrites to Strapi, so `next/image` treats them as local images.
 
 ## Conventions

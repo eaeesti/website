@@ -5,6 +5,7 @@ import ContactSection from "./ContactSection";
 import CtaSection from "./CtaSection";
 import DonationSection from "./DonationSection";
 import EmbedSection from "./EmbedSection";
+import EventsSection from "./EventsSection";
 import FaqSection from "./FaqSection";
 import HeaderSection from "./HeaderSection";
 import HeroSection from "./HeroSection";
@@ -66,6 +67,8 @@ function Section({
       return <BlogPostsSection {...section} context={context} />;
     case "sections.donation-section":
       return <DonationSection {...section} context={context} />;
+    case "sections.events-section":
+      return <EventsSection {...section} context={context} />;
     case "sections.podcast-section":
       return <PodcastSection {...section} context={context} />;
     case "sections.partner-section":

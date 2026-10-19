@@ -214,6 +214,20 @@ export interface StrapiEmbedSection {
   caption: string | null;
 }
 
+export interface StrapiEventsSection {
+  id: number;
+  __component: "sections.events-section";
+  title: string | null;
+  text: BlocksContent | null;
+  calendarUrl: string;
+  upcomingCount: number | null;
+  pastCount: number | null;
+  pastTitle: string | null;
+  noEventsText: string | null;
+  background: "white" | "grey" | null;
+  buttons: StrapiButton[];
+}
+
 export interface StrapiFaqSection {
   id: number;
   __component: "sections.faq-section";
@@ -315,6 +329,7 @@ export type StrapiSection =
   | StrapiEmbedSection
   | StrapiDonationSection
   | StrapiPodcastSection
+  | StrapiEventsSection
   | StrapiNewsletterSection
   | StrapiPartnerSection;
 

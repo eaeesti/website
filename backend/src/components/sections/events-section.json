@@ -1,0 +1,51 @@
+{
+  "collectionName": "components_sections_events_sections",
+  "info": {
+    "displayName": "Events calendar",
+    "icon": "calendar",
+    "description": "Upcoming (and optionally past) events from a public Google Calendar"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "text": {
+      "type": "blocks"
+    },
+    "calendarUrl": {
+      "type": "string",
+      "required": true
+    },
+    "upcomingCount": {
+      "type": "integer",
+      "default": 3,
+      "min": 1,
+      "max": 20
+    },
+    "pastCount": {
+      "type": "integer",
+      "default": 0,
+      "min": 0,
+      "max": 50
+    },
+    "pastTitle": {
+      "type": "string",
+      "default": "Past events"
+    },
+    "noEventsText": {
+      "type": "string",
+      "default": "No upcoming events at the moment."
+    },
+    "background": {
+      "type": "enumeration",
+      "enum": ["white", "grey"],
+      "default": "white"
+    },
+    "buttons": {
+      "type": "component",
+      "repeatable": true,
+      "component": "elements.button"
+    }
+  }
+}

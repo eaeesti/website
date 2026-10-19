@@ -399,6 +399,45 @@ export interface SectionsEmbedSection extends Struct.ComponentSchema {
   };
 }
 
+export interface SectionsEventsSection extends Struct.ComponentSchema {
+  collectionName: 'components_sections_events_sections';
+  info: {
+    description: 'Upcoming (and optionally past) events from a public Google Calendar';
+    displayName: 'Events calendar';
+    icon: 'calendar';
+  };
+  attributes: {
+    background: Schema.Attribute.Enumeration<['white', 'grey']> &
+      Schema.Attribute.DefaultTo<'white'>;
+    buttons: Schema.Attribute.Component<'elements.button', true>;
+    calendarUrl: Schema.Attribute.String & Schema.Attribute.Required;
+    noEventsText: Schema.Attribute.String &
+      Schema.Attribute.DefaultTo<'No upcoming events at the moment.'>;
+    pastCount: Schema.Attribute.Integer &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 50;
+          min: 0;
+        },
+        number
+      > &
+      Schema.Attribute.DefaultTo<0>;
+    pastTitle: Schema.Attribute.String &
+      Schema.Attribute.DefaultTo<'Past events'>;
+    text: Schema.Attribute.Blocks;
+    title: Schema.Attribute.String;
+    upcomingCount: Schema.Attribute.Integer &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 20;
+          min: 1;
+        },
+        number
+      > &
+      Schema.Attribute.DefaultTo<3>;
+  };
+}
+
 export interface SectionsFaqSection extends Struct.ComponentSchema {
   collectionName: 'components_sections_faq_section';
   info: {
@@ -587,6 +626,7 @@ declare module '@strapi/strapi' {
       'sections.cta-section': SectionsCtaSection;
       'sections.donation-section': SectionsDonationSection;
       'sections.embed-section': SectionsEmbedSection;
+      'sections.events-section': SectionsEventsSection;
       'sections.faq-section': SectionsFaqSection;
       'sections.header-section': SectionsHeaderSection;
       'sections.hero-section': SectionsHeroSection;

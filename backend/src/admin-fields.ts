@@ -300,6 +300,37 @@ const HINTS: Record<string, Record<string, FieldHint>> = {
       description: "How tall the form is once it's loaded.",
     },
   },
+  "sections.events-section": {
+    text: {
+      label: "Intro",
+      description:
+        "Optional text beside the events, e.g. how to take part. With a title or intro, the events are shown on the right on wide screens.",
+    },
+    calendarUrl: {
+      label: "Calendar",
+      description:
+        "The calendar's public address in iCal format (Google Calendar: the calendar's settings → Integrate calendar). Its embed link also works. Changes in the calendar appear within 15 minutes.",
+      placeholder:
+        "https://calendar.google.com/calendar/ical/…/public/basic.ics",
+    },
+    upcomingCount: {
+      label: "Upcoming events",
+      description: "How many upcoming events to show at most.",
+    },
+    pastCount: {
+      label: "Past events",
+      description:
+        "How many recent past events to list under the upcoming ones. 0 lists none.",
+    },
+    pastTitle: { label: "Past events title" },
+    noEventsText: {
+      label: "No events text",
+      description: "Shown when nothing is coming up.",
+    },
+    background: {
+      description: "On Grey, the events are on white cards.",
+    },
+  },
   "sections.podcast-section": {
     rssUrl: {
       label: "RSS feed",

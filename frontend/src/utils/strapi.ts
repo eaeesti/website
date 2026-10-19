@@ -124,6 +124,7 @@ const SECTIONS_POPULATE = {
     },
     "sections.text-section": { populate: "*" },
     "sections.podcast-section": { populate: "*" },
+    "sections.events-section": { populate: BUTTONS },
     "sections.newsletter-section": { populate: "*" },
     "sections.partner-section": { populate: { image: true } },
     "sections.text-image-section": { populate: { image: true, ...BUTTONS } },
