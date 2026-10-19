@@ -70,18 +70,32 @@ function googleEventLink(
   return `https://calendar.google.com/calendar/event?eid=${eid}&ctz=${CALENDAR_TIME_ZONE}&hl=${language}`;
 }
 
+/** "10113 Tallinn" */
+const POSTCODE_AND_PLACE = /^\d{4,6}\s+(\D.*)$/;
+/** A house number as a word of its own: "9", "60a", "64/2", "9-19". */
+const HOUSE_NUMBER = /(^|\s)\d+[a-z]?([/-]\d+[a-z]?)?(\s|$)/i;
+/** A street without a number ("Raekoja plats"), a county, or Estonia. */
+const LEFT_OUT =
+  /\s(tn|tänav|mnt|maantee|pst|puiestee|tee|plats)\.?$|maakond$|county$|^(estonia|eesti)$/i;
+
 /**
- * A location as shown on the site: without links (online events often have
- * "Discord: https://…") or the country.
+ * A location as shown on the site: names and places, without street
+ * addresses, which are often someone's home. "Karakter, Tatari 64/2,
+ * 10134 Tallinn, Estonia" becomes "Karakter, Tallinn", "Näidise tn 9, 10111
+ * Tallinn" becomes "Tallinn", and "Mari's place, Tallinn" stays. Links are
+ * left out too (online events often have "Discord: https://…").
  */
 export function cleanLocation(location: string | null): string | null {
   if (!location) return null;
-  const cleaned = location
+  const parts = location
     .replace(/https?:\/\/\S+/g, "")
-    .replace(/,\s*(Estonia|Eesti)\s*$/i, "")
-    .replace(/[\s:,]+$/, "")
-    .trim();
-  return cleaned || null;
+    .split(",")
+    .map((part) => {
+      const trimmed = part.trim().replace(/[\s.:]+$/, "");
+      return trimmed.match(POSTCODE_AND_PLACE)?.[1] ?? trimmed;
+    })
+    .filter((part) => part && !HOUSE_NUMBER.test(part) && !LEFT_OUT.test(part));
+  return [...new Set(parts)].join(", ") || null;
 }
 
 function timeValue(time: ICAL.Time): string {
@@ -178,18 +192,18 @@ export function isOver(event: CalendarEvent, now: Date): boolean {
 
 /**
  * The next events (including ones in progress), soonest first, and the most
- * recent past ones, latest first.
+ * recent past ones, latest first. With `upcoming` null, all upcoming events.
  */
 export function splitEvents(
   events: CalendarEvent[],
   now: Date,
-  counts: { upcoming: number; past: number },
+  counts: { upcoming: number | null; past: number },
 ): { upcoming: CalendarEvent[]; past: CalendarEvent[] } {
   const past = events.filter((event) => isOver(event, now));
   return {
     upcoming: events
       .filter((event) => !isOver(event, now))
-      .slice(0, counts.upcoming),
+      .slice(0, counts.upcoming ?? undefined),
     past: counts.past > 0 ? past.slice(-counts.past).toReversed() : [],
   };
 }
@@ -288,7 +302,7 @@ export function eventDay(
  */
 export async function getCalendarEvents(
   calendarUrl: string,
-  options: { language: string; upcoming: number; past: number },
+  options: { language: string; upcoming: number | null; past: number },
 ): Promise<{
   upcoming: CalendarEvent[];
   past: CalendarEvent[];

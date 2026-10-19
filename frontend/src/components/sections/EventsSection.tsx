@@ -33,7 +33,8 @@ export default async function EventsSection({
 }: StrapiEventsSection & { context: SectionContext }) {
   const events = await getCalendarEvents(calendarUrl, {
     language: context.locale,
-    upcoming: upcomingCount ?? 3,
+    // Empty means all of them.
+    upcoming: upcomingCount,
     past: pastCount ?? 0,
   });
   const locale = context.global?.dateLocale ?? "et-EE";

@@ -315,7 +315,8 @@ const HINTS: Record<string, Record<string, FieldHint>> = {
     },
     upcomingCount: {
       label: "Upcoming events",
-      description: "How many upcoming events to show at most.",
+      description:
+        "How many upcoming events to show at most. Leave it empty to show all of them.",
     },
     pastCount: {
       label: "Past events",

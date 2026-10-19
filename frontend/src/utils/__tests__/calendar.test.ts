@@ -112,15 +112,32 @@ describe("calendarFeedUrl", () => {
 });
 
 describe("cleanLocation", () => {
-  it("drops links and the country", () => {
-    expect(cleanLocation("Tatari 64/2, 10134 Tallinn, Eesti")).toBe(
-      "Tatari 64/2, 10134 Tallinn",
-    );
-    expect(cleanLocation("EA Eesti Discord: https://discord.gg/abc")).toBe(
-      "EA Eesti Discord",
-    );
-    expect(cleanLocation("https://meet.google.com/abc")).toBeNull();
-    expect(cleanLocation(null)).toBeNull();
+  it.each([
+    ["Näidise tn 9, 10111 Tallinn, Estonia", "Tallinn"],
+    ["Näidise 9-19", null],
+    ["Karakter, Tatari 64/2, 10134 Tallinn, Estonia", "Karakter, Tallinn"],
+    ["Telliskivi tn 60a/5, 10412 Tallinn, Estonia", "Tallinn"],
+    [
+      "Hr. Mauruse Pubi, Estonia puiestee 8, Kesklinn, 10148 Tallinn, Harju maakond, Estonia",
+      "Hr. Mauruse Pubi, Kesklinn, Tallinn",
+    ],
+    [
+      "NOP Kohvik ja Pood, Johann Köleri tänav, Tallinn, Eesti",
+      "NOP Kohvik ja Pood, Tallinn",
+    ],
+    ["Näidise 23, 51010 Tartu, Tartu maakond, Eesti", "Tartu"],
+    ["Raekoja plats, Tartu, Estonia", "Tartu"],
+    ["Mari's place, Tallinn", "Mari's place, Tallinn"],
+    ["Saadjärve (ca 20km Tartust)", "Saadjärve (ca 20km Tartust)"],
+    ["Tallinna Ülikool, ruum A-121", "Tallinna Ülikool, ruum A-121"],
+    ["12162 Stockholm, Sweden", "Stockholm, Sweden"],
+    ["New York, NY, USA", "New York, NY, USA"],
+    ["EA Eesti Discord: https://discord.gg/abc", "EA Eesti Discord"],
+    ["Discord. https://discord.com/invite/abc", "Discord"],
+    ["https://meet.google.com/abc", null],
+    [null, null],
+  ])("%s → %s", (location, expected) => {
+    expect(cleanLocation(location)).toBe(expected);
   });
 });
 
@@ -173,9 +190,7 @@ describe("parseCalendar", () => {
   });
 
   it("cleans up locations", () => {
-    expect(byTitle("Estimation Game").location).toBe(
-      "Telliskivi tn 60a/5, 10412 Tallinn",
-    );
+    expect(byTitle("Estimation Game").location).toBe("Tallinn");
     expect(byTitle("Aruteluõhtu").location).toBe("EA Eesti Discord");
   });
 });
@@ -205,6 +220,13 @@ describe("splitEvents", () => {
     expect(splitEvents([summer], now, { upcoming: 1, past: 1 }).past).toEqual([
       summer,
     ]);
+  });
+
+  it("lists all upcoming events when there's no limit", () => {
+    const now = new Date("2026-01-01T00:00:00Z");
+    expect(
+      splitEvents(events, now, { upcoming: null, past: 0 }).upcoming,
+    ).toHaveLength(events.length);
   });
 
   it("lists no past events unless asked", () => {

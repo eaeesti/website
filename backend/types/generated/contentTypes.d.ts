@@ -838,6 +838,7 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
         'sections.embed-section',
         'sections.donation-section',
         'sections.podcast-section',
+        'sections.events-section',
         'sections.newsletter-section',
         'sections.partner-section',
       ]

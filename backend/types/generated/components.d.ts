@@ -429,7 +429,6 @@ export interface SectionsEventsSection extends Struct.ComponentSchema {
     upcomingCount: Schema.Attribute.Integer &
       Schema.Attribute.SetMinMax<
         {
-          max: 20;
           min: 1;
         },
         number
