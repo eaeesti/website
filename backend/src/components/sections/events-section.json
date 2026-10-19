@@ -36,6 +36,9 @@
       "type": "string",
       "default": "No upcoming events at the moment."
     },
+    "subscribeText": {
+      "type": "string"
+    },
     "background": {
       "type": "enumeration",
       "enum": ["white", "grey"],

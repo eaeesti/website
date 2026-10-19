@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
   calendarFeedUrl,
+  calendarSubscribeLinks,
   cleanLocation,
   eventDay,
   formatEventDate,
@@ -108,6 +109,20 @@ describe("calendarFeedUrl", () => {
     expect(calendarFeedUrl("http://example.com/cal.ics")).toBeNull();
     expect(calendarFeedUrl("not a url")).toBeNull();
     expect(calendarFeedUrl("")).toBeNull();
+  });
+});
+
+describe("calendarSubscribeLinks", () => {
+  it("links to Google Calendar and to the feed as webcal:", () => {
+    expect(calendarSubscribeLinks(CALENDAR_ID)).toEqual({
+      google: `https://calendar.google.com/calendar/u/0?cid=${btoa(CALENDAR_ID).replace(/=+$/, "")}`,
+      ical: FEED_URL.replace("https:", "webcal:"),
+    });
+    expect(calendarSubscribeLinks("https://example.com/cal.ics")).toEqual({
+      google: null,
+      ical: "webcal://example.com/cal.ics",
+    });
+    expect(calendarSubscribeLinks("nope")).toBeNull();
   });
 });
 

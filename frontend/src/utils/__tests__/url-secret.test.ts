@@ -10,6 +10,7 @@ describe("safeHref", () => {
       "https://example.com",
       "mailto:a@b.ee",
       "tel:+3725555",
+      "webcal://calendar.google.com/calendar/ical/x/public/basic.ics",
     ]) {
       expect(safeHref(href)).toBe(href);
     }

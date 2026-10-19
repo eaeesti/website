@@ -328,6 +328,11 @@ const HINTS: Record<string, Record<string, FieldHint>> = {
       label: "No events text",
       description: "Shown when nothing is coming up.",
     },
+    subscribeText: {
+      label: "Subscribe text",
+      description:
+        'Optional. Shown under the upcoming events with links for adding the calendar to Google Calendar, Apple Calendar or Outlook, e.g. "Add our events to your calendar:".',
+    },
     background: {
       description: "On Grey, the events are on white cards.",
     },

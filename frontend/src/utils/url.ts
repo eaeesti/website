@@ -1,4 +1,5 @@
-const SAFE_PROTOCOLS = ["http:", "https:", "mailto:", "tel:"];
+// webcal: subscribes a calendar app to an iCal feed.
+const SAFE_PROTOCOLS = ["http:", "https:", "mailto:", "tel:", "webcal:"];
 
 /**
  * Links come from the CMS. Anything that isn't a relative path, an anchor or

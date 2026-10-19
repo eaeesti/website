@@ -224,6 +224,7 @@ export interface StrapiEventsSection {
   pastCount: number | null;
   pastTitle: string | null;
   noEventsText: string | null;
+  subscribeText: string | null;
   background: "white" | "grey" | null;
   buttons: StrapiButton[];
 }

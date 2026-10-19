@@ -55,6 +55,25 @@ export function googleCalendarId(feedUrl: string): string | null {
 }
 
 /**
+ * Where visitors can subscribe to the calendar: Google Calendar's page for
+ * adding it (only for Google calendars), and the iCal feed as a webcal: link,
+ * which Apple Calendar and Outlook open as a subscription.
+ */
+export function calendarSubscribeLinks(
+  calendarUrl: string,
+): { google: string | null; ical: string } | null {
+  const feedUrl = calendarFeedUrl(calendarUrl);
+  if (!feedUrl) return null;
+  const calendarId = googleCalendarId(feedUrl);
+  return {
+    google: calendarId
+      ? `https://calendar.google.com/calendar/u/0?cid=${btoa(calendarId).replace(/=+$/, "")}`
+      : null,
+    ical: feedUrl.replace(/^https:/, "webcal:"),
+  };
+}
+
+/**
  * Google Calendar's page for an event, readable without an account. Its ID
  * is the event's UID without "@google.com". A repeating event links to the
  * series: links to single occurrences ask visitors to sign in.

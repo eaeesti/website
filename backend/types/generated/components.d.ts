@@ -424,6 +424,7 @@ export interface SectionsEventsSection extends Struct.ComponentSchema {
       Schema.Attribute.DefaultTo<0>;
     pastTitle: Schema.Attribute.String &
       Schema.Attribute.DefaultTo<'Past events'>;
+    subscribeText: Schema.Attribute.String;
     text: Schema.Attribute.Blocks;
     title: Schema.Attribute.String;
     upcomingCount: Schema.Attribute.Integer &

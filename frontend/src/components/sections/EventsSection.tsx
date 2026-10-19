@@ -1,7 +1,8 @@
-import { MapPinIcon } from "@heroicons/react/20/solid";
+import { CalendarDaysIcon, MapPinIcon } from "@heroicons/react/20/solid";
 import type { StrapiEventsSection } from "@/types/generated/strapi";
 import { hasBlocksContent } from "@/utils/blocks";
 import {
+  calendarSubscribeLinks,
   eventDay,
   formatEventDate,
   formatEventTime,
@@ -27,6 +28,7 @@ export default async function EventsSection({
   pastCount,
   pastTitle,
   noEventsText,
+  subscribeText,
   background,
   buttons,
   context,
@@ -37,6 +39,7 @@ export default async function EventsSection({
     upcoming: upcomingCount,
     past: pastCount ?? 0,
   });
+  const subscribe = subscribeText ? calendarSubscribeLinks(calendarUrl) : null;
   const locale = context.global?.dateLocale ?? "et-EE";
   const grey = background === "grey";
   const hasText = hasBlocksContent(text);
@@ -88,6 +91,31 @@ export default async function EventsSection({
                 )}
               >
                 {noEventsText ?? "No upcoming events at the moment."}
+              </p>
+            )}
+            {subscribe && (
+              <p className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-600">
+                <CalendarDaysIcon
+                  aria-hidden="true"
+                  className="size-5 flex-none text-slate-400"
+                />
+                <span>{subscribeText}</span>
+                {subscribe.google && (
+                  <Anchor
+                    href={subscribe.google}
+                    newTab
+                    externalIcon
+                    className="font-semibold text-primary-700 hover:text-primary-900"
+                  >
+                    Google Calendar
+                  </Anchor>
+                )}
+                <Anchor
+                  href={subscribe.ical}
+                  className="font-semibold text-primary-700 hover:text-primary-900"
+                >
+                  Apple Calendar, Outlook
+                </Anchor>
               </p>
             )}
             {events.past.length > 0 && (
