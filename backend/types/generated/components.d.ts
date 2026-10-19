@@ -479,6 +479,8 @@ export interface SectionsPartnerSection extends Struct.ComponentSchema {
     icon: 'star';
   };
   attributes: {
+    background: Schema.Attribute.Enumeration<['blue', 'white', 'grey']> &
+      Schema.Attribute.DefaultTo<'blue'>;
     image: Schema.Attribute.Media<'images'> & Schema.Attribute.Required;
     text: Schema.Attribute.Blocks;
   };

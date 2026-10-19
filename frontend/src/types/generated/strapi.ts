@@ -256,6 +256,7 @@ export interface StrapiPartnerSection {
   __component: "sections.partner-section";
   text: BlocksContent | null;
   image: StrapiMedia | null;
+  background: "blue" | "white" | "grey" | null;
 }
 
 export interface StrapiPodcastSection {

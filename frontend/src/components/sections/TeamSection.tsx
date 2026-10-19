@@ -25,7 +25,8 @@ export default function TeamSection({ title, teamMembers }: StrapiTeamSection) {
               className="flex flex-col gap-6 sm:flex-row lg:flex-col xl:flex-row"
             >
               {member.image && (
-                <div className="relative aspect-square w-48 flex-none overflow-hidden rounded-2xl bg-slate-100 sm:w-52">
+                // Beside the text it grows with a long bio, up to a 4:5 portrait.
+                <div className="relative aspect-square w-48 flex-none overflow-hidden rounded-2xl bg-slate-100 sm:max-h-65 sm:w-52">
                   <StrapiImage
                     image={member.image}
                     fill

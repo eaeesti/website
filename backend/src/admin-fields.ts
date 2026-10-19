@@ -280,6 +280,9 @@ const HINTS: Record<string, Record<string, FieldHint>> = {
       label: "Badge",
       description: "Shown in a white circle; a square image works best.",
     },
+    background: {
+      description: "Blue is the bright EA blue, with white text.",
+    },
   },
   "sections.newsletter-section": {
     text: { description: "A sentence or two about what subscribers get." },

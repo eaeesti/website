@@ -29,3 +29,17 @@ export function standaloneUrl(nodes: InlineNode[]): string | null {
   if (node.type === "link") return node.url;
   return /^https?:\/\/\S+$/.test(node.text.trim()) ? node.text.trim() : null;
 }
+
+/** How many characters of text the content has, e.g. to estimate its height. */
+export function blocksTextLength(
+  content: BlocksContent | null | undefined,
+): number {
+  type Node = { text: string } | { children: Node[] };
+  const length = (node: Node): number =>
+    "text" in node
+      ? node.text.length
+      : "children" in node
+        ? node.children.reduce((sum, child) => sum + length(child), 0)
+        : 0;
+  return (content ?? []).reduce((sum, block) => sum + length(block), 0);
+}
