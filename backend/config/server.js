@@ -1,6 +1,9 @@
 module.exports = ({ env }) => ({
   host: env("HOST", "0.0.0.0"),
   port: env.int("PORT", 1337),
+  // Where people reach Strapi, for the links in its emails (password resets).
+  // Unset, Strapi links to the address it listens on, like 0.0.0.0:1337.
+  url: env("PUBLIC_URL", ""),
   // Koa only reads the client's real address out of X-Forwarded-For when
   // app.proxy is on, and Strapi wires app.proxy from `server.proxy.koa`
   // specifically — a bare `proxy: true` is read as `server.proxy.koa ===
