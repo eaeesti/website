@@ -14,10 +14,15 @@ module.exports = ({ env }) => ({
         host: env("SMTP_HOST", "smtp-relay.brevo.com"),
         port: env.int("SMTP_PORT", 587),
         secure: false,
-        auth: {
-          user: env("SMTP_USERNAME"),
-          pass: env("SMTP_PASSWORD"),
-        },
+        // Without a username, no login: a relay that knows the server by its
+        // address (like Google Workspace's) still offers one, and nodemailer
+        // would try it with empty credentials and fail.
+        ...(env("SMTP_USERNAME") && {
+          auth: {
+            user: env("SMTP_USERNAME"),
+            pass: env("SMTP_PASSWORD"),
+          },
+        }),
       },
       settings: {
         defaultFrom: env("EMAIL_DEFAULT_FROM"),
