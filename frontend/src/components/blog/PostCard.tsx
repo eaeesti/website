@@ -7,9 +7,15 @@ import StrapiImage from "../elements/StrapiImage";
 interface PostCardProps {
   post: StrapiBlogPost;
   dateLocale: string | null | undefined;
+  headingLevel: 2 | 3;
 }
 
-export default function PostCard({ post, dateLocale }: PostCardProps) {
+export default function PostCard({
+  post,
+  dateLocale,
+  headingLevel,
+}: PostCardProps) {
+  const Heading = headingLevel === 2 ? "h2" : "h3";
   const byline = bylineText(post);
   const date = formatDate(post.date, dateLocale);
 
@@ -28,13 +34,13 @@ export default function PostCard({ post, dateLocale }: PostCardProps) {
       <div className="mt-5 flex items-center gap-x-3 text-xs text-slate-500">
         {date && <time dateTime={post.date}>{date}</time>}
       </div>
-      <h3 className="mt-2 text-lg leading-6 font-bold text-slate-900 group-hover:text-primary-700">
+      <Heading className="mt-2 text-lg leading-6 font-bold text-slate-900 group-hover:text-primary-700">
         <Anchor href={postPath(post.slug)}>
           {/* Makes the whole card clickable. */}
           <span className="absolute inset-0" aria-hidden="true" />
           {post.title}
         </Anchor>
-      </h3>
+      </Heading>
       {post.excerpt && (
         <p className="mt-3 line-clamp-3 text-sm leading-6 text-slate-600">
           {post.excerpt}

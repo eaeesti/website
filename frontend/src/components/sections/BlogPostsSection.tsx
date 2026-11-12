@@ -33,7 +33,11 @@ export default async function BlogPostsSection({
           categories={categories}
           className="mb-12 sm:justify-center"
         />
-        <PostGrid posts={posts} dateLocale={context.global?.dateLocale} />
+        <PostGrid
+          posts={posts}
+          dateLocale={context.global?.dateLocale}
+          headingLevel={title ? 3 : 2}
+        />
         {showPagination && (
           <Pagination
             basePath={context.path}

@@ -71,7 +71,11 @@ export default async function CategoryPage({ slug, page }: CategoryPageProps) {
       </PageHeader>
       <section className="px-4 py-16 sm:px-6 sm:py-20">
         <div className="mx-auto max-w-6xl">
-          <PostGrid posts={listing.posts} dateLocale={global?.dateLocale} />
+          <PostGrid
+            posts={listing.posts}
+            dateLocale={global?.dateLocale}
+            headingLevel={2}
+          />
           <Pagination
             basePath={basePath}
             page={listing.pagination.page}

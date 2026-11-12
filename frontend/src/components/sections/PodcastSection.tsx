@@ -33,6 +33,8 @@ export default async function PodcastSection({
       episode={item}
       dateLocale={dateLocale}
       listenText={listenText ?? "Listen on Spotify"}
+      // Under the section's own h2, or straight under the page's h1.
+      Heading={title ? "h3" : "h2"}
     />
   );
   const rest = episodes.slice(FIRST_EPISODES);
@@ -70,9 +72,11 @@ function Episode({
   episode,
   dateLocale,
   listenText,
+  Heading,
 }: {
   episode: PodcastEpisode;
   dateLocale: string | null | undefined;
+  Heading: "h2" | "h3";
   listenText: string;
 }) {
   const date = formatDate(episode.date, dateLocale);
@@ -96,9 +100,9 @@ function Episode({
           {date && duration && <span aria-hidden="true">·</span>}
           {duration && <span>{duration}</span>}
         </p>
-        <h3 className="mt-1 text-lg leading-snug font-bold text-slate-900">
+        <Heading className="mt-1 text-lg leading-snug font-bold text-slate-900">
           {episode.title}
-        </h3>
+        </Heading>
         {episode.description && (
           <p className="mt-2 line-clamp-3 text-sm leading-6 whitespace-pre-line text-slate-600">
             {episode.description}

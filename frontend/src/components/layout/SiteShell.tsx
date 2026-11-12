@@ -49,6 +49,13 @@ export default async function SiteShell({
         emailCopied: global?.emailCopiedText ?? "Email address copied!",
       }}
     >
+      {/* For keyboard users: the first Tab, past the whole menu. */}
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100] focus:rounded-md focus:bg-white focus:px-4 focus:py-2.5 focus:text-sm focus:font-semibold focus:text-primary-800 focus:shadow-lg"
+      >
+        {locale === "et" ? "Liigu sisu juurde" : "Skip to content"}
+      </a>
       {preview && (
         <PreviewBanner
           path={path}

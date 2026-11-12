@@ -44,6 +44,8 @@ export default async function EventsSection({
   const grey = background === "grey";
   const hasText = hasBlocksContent(text);
   const hasIntro = Boolean(title || hasText || buttons.length > 0);
+  // Under the section's own h2, or straight under the page's h1.
+  const Heading = title ? "h3" : "h2";
 
   return (
     <section
@@ -80,6 +82,7 @@ export default async function EventsSection({
                     locale={locale}
                     now={events.now}
                     grey={grey}
+                    Heading={Heading}
                   />
                 ))}
               </ul>
@@ -120,9 +123,9 @@ export default async function EventsSection({
             )}
             {events.past.length > 0 && (
               <>
-                <h3 className="mt-12 text-lg font-bold text-slate-900">
+                <Heading className="mt-12 text-lg font-bold text-slate-900">
                   {pastTitle ?? "Past events"}
-                </h3>
+                </Heading>
                 <ul
                   role="list"
                   className="mt-3 divide-y divide-slate-200 border-y border-slate-200"
@@ -159,11 +162,13 @@ function UpcomingEvent({
   locale,
   now,
   grey,
+  Heading,
 }: {
   event: CalendarEvent;
   locale: string;
   now: Date;
   grey: boolean;
+  Heading: "h2" | "h3";
 }) {
   const { day, month } = eventDay(event, locale);
   return (
@@ -187,12 +192,12 @@ function UpcomingEvent({
             {formatEventTime(event, locale, now)}
           </time>
         </p>
-        <h3 className="mt-1 text-lg leading-snug font-bold text-slate-900">
+        <Heading className="mt-1 text-lg leading-snug font-bold text-slate-900">
           <EventTitle
             event={event}
             className="after:absolute after:inset-0 after:rounded-2xl"
           />
-        </h3>
+        </Heading>
         {event.location && (
           <p className="mt-1.5 flex gap-1.5 text-sm text-slate-600">
             <MapPinIcon

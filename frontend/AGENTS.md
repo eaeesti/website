@@ -64,6 +64,7 @@ src/
 - Iframes are only allowed for the hosts in `utils/embed.ts`, which also feeds the CSP's `frame-src` in `next.config.ts`.
 - The navbar is transparent at the top of the page, over a dark first section marked `data-nav-overlay` (the hero, page headers, blog post headers). Such a section must leave room for it with `pt-[calc(var(--nav-height)+…)]`. Pages that start with anything else get a solid navbar and top padding automatically (`globals.css`).
 - The site sets no cookies (Plausible is cookieless), so it needs no cookie banner. Keep it that way: third-party embeds that set cookies (like the Smaily newsletter form, which loads reCAPTCHA) load only after a click; see `NewsletterForm.tsx`.
+- Headings follow the page outline: a section's items are `h3` under its own `h2` title, and `h2` when the section has no title (`EventsSection`, `PodcastSection`, `PostGrid`'s `headingLevel`).
 - Links to other sites get an icon with `<Anchor externalIcon>`; buttons and rich text do this already.
 
 See root [AGENTS.md](../AGENTS.md) for shared TypeScript conventions.
