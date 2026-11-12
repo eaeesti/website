@@ -311,6 +311,15 @@ describe("google-login middleware", () => {
       ["/admin/forgot-password", { email: editor.email }],
       ["/admin/reset-password", { resetPasswordToken: "t", password: "x" }],
       ["/admin/register", { registrationToken: "invite-jaan" }],
+      ["/admin/register-admin", { email: "new@example.com", password: "x" }],
+      // Strapi's router ignores case and a trailing slash, so these reach
+      // the same handlers.
+      ["/admin/login/", { email: editor.email, password: "x" }],
+      ["/admin/LOGIN", { email: editor.email, password: "x" }],
+      ["/Admin/Login/", { email: editor.email, password: "x" }],
+      ["/admin/Forgot-Password/", { email: editor.email }],
+      ["/admin/reset-password/", { resetPasswordToken: "t", password: "x" }],
+      ["/admin/REGISTER/", { registrationToken: "invite-jaan" }],
     ])("refuses %s, for everyone", async (path, body) => {
       const { strapi } = fakeStrapi([editor, invited]);
       const { ctx } = fakeContext({ method: "POST", path, body });
@@ -320,6 +329,15 @@ describe("google-login middleware", () => {
         error: { message: expect.stringContaining("Google") },
       });
     });
+
+    it.each(["/admin/logout", "/admin/access-token", "/admin/login-x"])(
+      "leaves %s to Strapi",
+      async (path) => {
+        const { strapi } = fakeStrapi([editor]);
+        const { ctx } = fakeContext({ method: "POST", path });
+        expect(await run(strapi, ctx)).toHaveBeenCalled();
+      },
+    );
   });
 
   describe("without a Google client", () => {

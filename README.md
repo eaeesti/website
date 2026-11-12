@@ -91,13 +91,18 @@ People log in with their EA Estonia Google account (an `@efektiivnealtruism.org`
 confirms who someone is; whether they get in is up to Strapi. To let someone in, add their address under Settings →
 Users and give them a role. They don't need the invite link: their first Google login activates the account.
 
+To take someone out, switch their user off or delete it in Strapi: removing them from the Workspace stops new logins
+but not a session they already have, and an address given to someone new would bring them the old account. Delete an
+invite nobody has used yet rather than switching it off, since an unused invite is already "inactive" and its first
+Google login activates it.
+
 Google login is on when `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` are set in the backend, from an OAuth client of
 type "Web application" in Google Cloud. Its authorised redirect URI is `PUBLIC_URL` followed by `/google-login/callback`,
 e.g. `https://strapi.efektiivnealtruism.org/google-login/callback`, or `http://localhost:1337/google-login/callback` for
 local development. `GOOGLE_WORKSPACE_DOMAIN` names the Workspace and defaults to `efektiivnealtruism.org`.
 
 While it's on, passwords are turned off for everyone: the login page shows only the Google button, and the admin's
-password routes refuse all requests. If Google login ever breaks, remove the two settings and restart Strapi to log in
+password routes refuse all requests, in any case and with or without a trailing slash, as Strapi's router matches them. If Google login ever breaks, remove the two settings and restart Strapi to log in
 with a password again. Strapi's own SSO needs its Enterprise plan, so this is the project's own code:
 `backend/src/middlewares/google-login.ts`, and the login page's button in `backend/src/admin/google-login.ts`.
 

@@ -1,7 +1,6 @@
 /**
- * Admin login with Google, for everyone, and with a password for Super
- * Admins only. Off until GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET are set;
- * until then passwords work as before.
+ * Admin login with Google instead of passwords. Off until GOOGLE_CLIENT_ID
+ * and GOOGLE_CLIENT_SECRET are set; until then passwords work as before.
  *
  * GET /google-login           → Google's account chooser
  * GET /google-login/callback  → back from Google: logs the user in to the
@@ -10,8 +9,9 @@
  *
  * Only active admin users that exist already get in. An invited user who
  * never set a password is activated by their first Google login, so invite
- * links aren't needed; one an administrator switched off stays out. The admin's password routes refuse everyone but Super
- * Admins, who keep a password so the admin can't be locked out by Google.
+ * links aren't needed; one an administrator switched off stays out. The
+ * admin's password routes refuse everyone, Super Admins included: if Google
+ * login ever breaks, removing the two settings turns passwords back on.
  * Logging in with Google doesn't depend on Strapi's Enterprise SSO.
  */
 import type { Core } from "@strapi/strapi";
@@ -45,13 +45,15 @@ const REFRESH_COOKIE = "strapi_admin_refresh";
 const ACCESS_COOKIE = "jwtToken";
 const ADMIN_COOKIE_PATH = "/admin";
 
-/** The admin routes that log in or set a password. */
-const PASSWORD_ROUTES = new Set([
-  "/admin/login",
-  "/admin/register",
-  "/admin/reset-password",
-  "/admin/forgot-password",
-]);
+/**
+ * The admin routes that log in or set a password, matched the way Strapi's
+ * router (@koa/router) matches them: whatever the case, and with or without
+ * a trailing slash. An exact comparison let "/admin/login/" and
+ * "/admin/LOGIN" through to the password check. register-admin creates the
+ * first Super Admin, and Strapi refuses it once any admin exists.
+ */
+const PASSWORD_ROUTE =
+  /^\/admin\/(login|register|register-admin|reset-password|forgot-password)\/?$/i;
 
 const PASSWORD_REFUSED =
   "Passwords are turned off: log in with the “Log in with Google” button.";
@@ -248,7 +250,7 @@ const googleLogin: Core.MiddlewareFactory = (_config, { strapi }) => {
       }
       return;
     }
-    if (ctx.method === "POST" && PASSWORD_ROUTES.has(ctx.path)) {
+    if (ctx.method === "POST" && PASSWORD_ROUTE.test(ctx.path)) {
       refusePassword(ctx);
       return;
     }
