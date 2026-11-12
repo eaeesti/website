@@ -47,6 +47,20 @@ export default async function SiteShell({
         close: global?.closeText ?? "Close",
         error: global?.errorText ?? "Something went wrong",
         emailCopied: global?.emailCopiedText ?? "Email address copied!",
+        ...(locale === "et"
+          ? {
+              playVideo: "Vaata videot",
+              listen: "Kuula",
+              showEmbed: "Näita",
+              embedNotice:
+                "Laaditakse teenusest {service}, mis võib kasutada küpsiseid.",
+            }
+          : {
+              playVideo: "Play video",
+              listen: "Listen",
+              showEmbed: "Show",
+              embedNotice: "Loads from {service}, which may use cookies.",
+            }),
       }}
     >
       {/* For keyboard users: the first Tab, past the whole menu. */}

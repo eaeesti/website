@@ -78,6 +78,9 @@ const nextConfig: NextConfig = {
     // Podcast episode covers, from the podcast's RSS feed.
     remotePatterns: [
       { protocol: "https", hostname: "d3t3ozftmdmh3i.cloudfront.net" },
+      // YouTube stills on players that load when clicked (ClickToLoad), so
+      // visitors' browsers don't contact YouTube before then.
+      { protocol: "https", hostname: "i.ytimg.com", pathname: "/vi/**" },
     ],
   },
 

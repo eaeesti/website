@@ -1,18 +1,22 @@
 /**
- * Hosts an embed section may frame. The embed section renders nothing for any
- * other host, and next.config.ts puts the same list in the CSP's frame-src, so
- * an editor pasting some other URL can't put a third-party page on the site.
+ * Hosts an embed section may frame, and who they are, for the placeholder
+ * shown until a visitor loads the embed. The embed section renders nothing for
+ * any other host, and next.config.ts puts the same list in the CSP's
+ * frame-src, so an editor pasting some other URL can't put a third-party page
+ * on the site.
  */
-export const EMBED_ORIGINS = [
-  "https://calendar.google.com",
-  "https://docs.google.com",
-  "https://open.spotify.com",
-  "https://www.youtube-nocookie.com",
-  "https://www.youtube.com",
-  "https://player.vimeo.com",
-  // The newsletter signup form (Smaily).
-  "https://ufp4cbgs.sendsmaily.net",
-];
+const EMBED_SERVICES: Record<string, string> = {
+  "https://calendar.google.com": "Google Calendar",
+  "https://docs.google.com": "Google",
+  "https://open.spotify.com": "Spotify",
+  "https://www.youtube-nocookie.com": "YouTube",
+  "https://www.youtube.com": "YouTube",
+  "https://player.vimeo.com": "Vimeo",
+  // The newsletter signup form.
+  "https://ufp4cbgs.sendsmaily.net": "Smaily",
+};
+
+export const EMBED_ORIGINS = Object.keys(EMBED_SERVICES);
 
 /**
  * The sandbox for embedded players, calendars and forms: they may run
@@ -52,20 +56,57 @@ export function toEmbedUrl(raw: string | null | undefined): string | null {
   return EMBED_ORIGINS.includes(url.origin) ? url.toString() : null;
 }
 
+/** YouTube's IDs are letters, digits, "-" and "_"; anything else isn't one. */
+const YOUTUBE_ID = /^[\w-]+$/;
+
 function youtubeVideoId(url: URL): string | null {
-  if (url.hostname === "youtu.be") {
-    return url.pathname.slice(1) || null;
-  }
-  if (
-    ["www.youtube.com", "youtube.com", "www.youtube-nocookie.com"].includes(
-      url.hostname,
-    )
-  ) {
+  const id = (() => {
+    if (url.hostname === "youtu.be") return url.pathname.slice(1);
+    if (
+      !["www.youtube.com", "youtube.com", "www.youtube-nocookie.com"].includes(
+        url.hostname,
+      )
+    ) {
+      return null;
+    }
     if (url.pathname === "/watch") return url.searchParams.get("v");
-    const embed = url.pathname.match(/^\/embed\/([\w-]+)/);
-    if (embed) return embed[1];
-  }
-  return null;
+    return url.pathname.match(/^\/embed\/([\w-]+)/)?.[1] ?? null;
+  })();
+  return id && YOUTUBE_ID.test(id) ? id : null;
+}
+
+/**
+ * What the placeholder of an allowed embed (a toEmbedUrl result) shows, and
+ * the address to load once it's clicked: videos start playing then, since
+ * the click was the visitor asking for it.
+ */
+export interface EmbedDetails {
+  /** Who serves the embed, named on the placeholder. */
+  service: string;
+  kind: "video" | "audio" | "embed";
+  /** A YouTube video's still image. */
+  thumbnail: string | null;
+  /** The address for the iframe, once a visitor has clicked. */
+  loadSrc: string;
+}
+
+export function embedDetails(src: string): EmbedDetails {
+  const url = new URL(src);
+  const youtubeId = youtubeVideoId(url);
+  const isVideo = Boolean(youtubeId) || url.hostname === "player.vimeo.com";
+  if (isVideo) url.searchParams.set("autoplay", "1");
+  return {
+    service: EMBED_SERVICES[url.origin] ?? url.hostname,
+    kind: isVideo
+      ? "video"
+      : url.hostname === "open.spotify.com"
+        ? "audio"
+        : "embed",
+    thumbnail: youtubeId
+      ? `https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg`
+      : null,
+    loadSrc: url.toString(),
+  };
 }
 
 export interface MediaEmbed {

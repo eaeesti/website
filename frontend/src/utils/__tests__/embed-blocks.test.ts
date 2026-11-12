@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { hasBlocksContent, standaloneUrl } from "../blocks";
-import { mediaEmbed, toEmbedUrl } from "../embed";
+import { embedDetails, mediaEmbed, toEmbedUrl } from "../embed";
 
 describe("toEmbedUrl", () => {
   it("allows the listed hosts and rewrites YouTube and Spotify links", () => {
@@ -53,6 +53,40 @@ describe("mediaEmbed", () => {
   it("ignores ordinary links", () => {
     expect(mediaEmbed("https://example.com")).toBeNull();
     expect(mediaEmbed("/blogi")).toBeNull();
+  });
+
+  it("only takes well-formed YouTube video IDs", () => {
+    expect(mediaEmbed("https://www.youtube.com/watch?v=a%2F..%2Fb")).toBeNull();
+    expect(mediaEmbed("https://youtu.be/abc/def")).toBeNull();
+  });
+});
+
+describe("embedDetails", () => {
+  it("names the service, and starts videos once clicked", () => {
+    expect(
+      embedDetails("https://www.youtube-nocookie.com/embed/WyprXhvGVYk"),
+    ).toEqual({
+      service: "YouTube",
+      kind: "video",
+      thumbnail: "https://i.ytimg.com/vi/WyprXhvGVYk/hqdefault.jpg",
+      loadSrc: "https://www.youtube-nocookie.com/embed/WyprXhvGVYk?autoplay=1",
+    });
+    expect(embedDetails("https://player.vimeo.com/video/123")).toEqual({
+      service: "Vimeo",
+      kind: "video",
+      thumbnail: null,
+      loadSrc: "https://player.vimeo.com/video/123?autoplay=1",
+    });
+    expect(
+      embedDetails("https://open.spotify.com/embed/episode/xyz"),
+    ).toMatchObject({
+      service: "Spotify",
+      kind: "audio",
+      loadSrc: "https://open.spotify.com/embed/episode/xyz",
+    });
+    expect(
+      embedDetails("https://calendar.google.com/calendar/embed?src=x"),
+    ).toMatchObject({ service: "Google Calendar", kind: "embed" });
   });
 });
 
