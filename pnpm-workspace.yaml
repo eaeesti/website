@@ -5,10 +5,16 @@ packages:
 # Security patches for dependencies Strapi pins to vulnerable versions.
 overrides:
   axios: ^1.20.0
-  dompurify: ^3.4.16
-  markdown-it: ^14.3.1
-  nodemailer: ^10.0.13
+  dompurify: ^3.4.17
+  fast-uri: ^3.1.9
+  follow-redirects: ^1.16.2
+  handlebars: ^4.7.10
+  markdown-it: ^14.3.3
+  nodemailer: ^10.1.4
+  qs: ^6.16.1
   sharp: ^0.35.5
+  "undici@^6.0.0": ^6.29.1
+  "zod@^4.0.0": ^4.6.6
 
 # Which dependencies may run install scripts. pnpm blocks all others.
 allowBuilds:
