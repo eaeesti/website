@@ -110,8 +110,100 @@ const nextConfig: NextConfig = {
       { source: "/et/:path*", destination: "/:path*", permanent: true },
       // URLs from the old Webflow site.
       { source: "/en/landing", destination: "/en", permanent: true },
+      ...wordpressRedirects,
     ];
   },
 };
+
+/**
+ * URLs from the WordPress site before Webflow (2017–2020), as the Wayback
+ * Machine has them, so links to it from elsewhere still lead somewhere. The
+ * first match wins, so the exceptions come before the general rules. Seven
+ * posts never moved on from WordPress; theirs go to the nearest page.
+ */
+const wordpressRedirects = [
+  // Pages, some under /index.php/ too.
+  ...[
+    ["/about", "/meist"],
+    ["/about/the-team", "/meist"],
+    ["/tegevuskava", "/meist"],
+    ["/vaartused", "/meist"],
+    ["/contact", "/kontakt"],
+    ["/kkk", "/tutvustus"],
+    ["/toeta", "/anneta"],
+    ["/vota-osa", "/tule-vabatahtlikuks"],
+    ["/oppematerjalid", "/materjalid"],
+    ["/kalender", "/uritused"],
+    ["/hackathon", "/uritused"],
+    ["/en/calendar", "/en/events"],
+    ["/newsletter", "/"],
+    ["/karjaar/test", "/karjaar"],
+  ].flatMap(([source, destination]) => [
+    { source, destination, permanent: true },
+    { source: `/index.php${source}`, destination, permanent: true },
+  ]),
+  { source: "/index.php/:path*", destination: "/:path*", permanent: true },
+
+  // Posts whose address changed, or that live on as something else.
+  ...[
+    [
+      "kas-oma-kire-jargimine-hea-karjaarinouanne",
+      "/blogi/kas-oma-kire-jargimine-on-hea-karjaarinouanne",
+    ],
+    [
+      "kes-efektiivsed-altruistid-ja-kuidas-nad-maailma-paremaks-muudavad",
+      "/blogi/kes-on-efektiivsed-altruistid-ja-kuidas-nad-maailma-paremaks-muudavad",
+    ],
+    ["efektiivse-altruismi-oppematerjalid", "/materjalid"],
+    ["efektiivse-altruismi-tutvustus", "/tutvustus"],
+    [
+      "vabatahtlikud-tegevused-efektiivne-altruism-eesti-ridades",
+      "/tule-vabatahtlikuks",
+    ],
+    // The series' later parts weren't moved; its first post stands for them.
+    ...[4, 5, 6, 7].map((part) => [
+      `kuidas-teha-head-paremini-${part}-osa`,
+      "/blogi/kuidas-teha-head-paremini",
+    ]),
+    ["erakordselt-lihtsad-meetodid-hea-tegemiseks", "/blogi"],
+    ["kuidas-valida-sobiv-valdkond-heategevuseks", "/blogi"],
+    ["risto-uuk-tarbimiskeskne-eluviis-mind-ei-paelu", "/blogi"],
+  ].map(([slug, destination]) => ({
+    source: `/:year(\\d{4})/:month(\\d{2})/:day(\\d{2})/${slug}`,
+    destination,
+    permanent: true,
+  })),
+  // Every other post kept its address after the date: /2019/03/07/slug.
+  {
+    source: "/:year(\\d{4})/:month(\\d{2})/:day(\\d{2})/:slug",
+    destination: "/blogi/:slug",
+    permanent: true,
+  },
+  // Monthly archives, the blog's later pages, and authors' pages.
+  {
+    source: "/:year(\\d{4})/:month(\\d{2})",
+    destination: "/blogi",
+    permanent: true,
+  },
+  { source: "/blogi/page/:page(\\d+)", destination: "/blogi", permanent: true },
+  { source: "/author/:path*", destination: "/blogi", permanent: true },
+
+  // Categories are topics now, mostly under the same name.
+  {
+    source: "/category/areng/:rest*",
+    destination: "/rubriik/eneseareng",
+    permanent: true,
+  },
+  {
+    source: "/category/podcast/:rest*",
+    destination: "/taskuhaaling",
+    permanent: true,
+  },
+  {
+    source: "/category/:slug/:rest*",
+    destination: "/rubriik/:slug",
+    permanent: true,
+  },
+];
 
 export default nextConfig;
