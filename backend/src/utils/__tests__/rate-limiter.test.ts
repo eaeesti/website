@@ -1,5 +1,63 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { FixedWindowLimiter } from "../rate-limiter";
+import {
+  configuredNetworks,
+  FixedWindowLimiter,
+  isInternalAddress,
+  parseNetworks,
+} from "../rate-limiter";
+
+describe("isInternalAddress", () => {
+  it.each([
+    "127.0.0.1",
+    "::1",
+    "::ffff:127.0.0.1",
+    "172.17.0.2",
+    "::ffff:172.17.0.2",
+    "10.0.0.5",
+    "192.168.1.10",
+    "fd00::1",
+  ])("counts %s as this machine's", (ip) => {
+    expect(isInternalAddress(ip, undefined)).toBe(true);
+  });
+
+  it.each([
+    "203.0.113.10",
+    "8.8.8.8",
+    // Outside 172.16.0.0/12, so not private without INTERNAL_NETWORKS.
+    "172.32.0.2",
+    "172.15.255.255",
+    "::ffff:8.8.8.8",
+    "2a03:4000::1",
+    "",
+    "not an address",
+  ])("counts %s as a visitor's", (ip) => {
+    expect(isInternalAddress(ip, undefined)).toBe(false);
+  });
+
+  it("adds the networks in INTERNAL_NETWORKS", () => {
+    const raw = "172.32.0.0/24, 2001:db8::/64";
+    expect(isInternalAddress("172.32.0.2", raw)).toBe(true);
+    expect(isInternalAddress("::ffff:172.32.0.2", raw)).toBe(true);
+    expect(isInternalAddress("2001:db8::5", raw)).toBe(true);
+    expect(isInternalAddress("172.32.1.2", raw)).toBe(false);
+    expect(isInternalAddress("127.0.0.1", raw)).toBe(true);
+  });
+});
+
+describe("parseNetworks", () => {
+  it("names the entries it can't read", () => {
+    const entries = configuredNetworks(
+      "172.32.0.0/24,,172.32.0.0, 300.1.1.1/8 ,10.0.0.0/33,::/129,1.2.3.4/x",
+    );
+    expect(parseNetworks(entries).invalid).toEqual([
+      "172.32.0.0",
+      "300.1.1.1/8",
+      "10.0.0.0/33",
+      "::/129",
+      "1.2.3.4/x",
+    ]);
+  });
+});
 
 describe("FixedWindowLimiter", () => {
   beforeEach(() => {

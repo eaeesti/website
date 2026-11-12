@@ -8,7 +8,7 @@ import {
 } from "../../../utils/contact";
 import {
   FixedWindowLimiter,
-  isProxyAddress,
+  isInternalAddress,
 } from "../../../utils/rate-limiter";
 
 // Every submission writes a row and sends mail through the organisation's
@@ -32,10 +32,11 @@ export default factories.createCoreController(
         return ctx.badRequest("Invalid contact form submission");
       }
 
-      // Skipped while SERVER_PROXY is off, when every visitor shares the
-      // proxy's address and this would throttle the whole site at once.
+      // Skipped for internal addresses, such as the proxy's while
+      // SERVER_PROXY is off, which every visitor would share: this would
+      // throttle the whole site at once.
       if (
-        !isProxyAddress(ctx.request.ip) &&
+        !isInternalAddress(ctx.request.ip) &&
         !submissionsPerIp.tryConsume(ctx.request.ip)
       ) {
         // Status must be passed to send(): its default overwrites ctx.status.

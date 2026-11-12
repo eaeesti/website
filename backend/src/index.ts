@@ -3,6 +3,7 @@ import fs from "fs";
 import path from "path";
 import { syncAdminFields } from "./admin-fields";
 import { syncEditorRole } from "./editor-role";
+import { configuredNetworks, parseNetworks } from "./utils/rate-limiter";
 import {
   affectsPublicSite,
   scheduleFrontendRevalidation,
@@ -237,8 +238,21 @@ function warnIfProxyUntrusted(strapi: Core.Strapi): void {
   if (process.env.NODE_ENV !== "production") return;
   strapi.log.warn(
     "⚠️  SERVER_PROXY is off: every request will report the reverse proxy's " +
-      "address, so rate limits are skipped. Turn it on once nginx overwrites " +
-      "X-Forwarded-For with the real client address.",
+      "address, so rate limits are skipped wherever that address is internal. " +
+      "Turn it on once nginx overwrites X-Forwarded-For with the real client " +
+      "address.",
+  );
+}
+
+/** A typo in INTERNAL_NETWORKS would silently leave the site rate-limited. */
+function warnIfInternalNetworksInvalid(strapi: Core.Strapi): void {
+  const { invalid } = parseNetworks(
+    configuredNetworks(process.env.INTERNAL_NETWORKS),
+  );
+  if (invalid.length === 0) return;
+  strapi.log.warn(
+    `⚠️  INTERNAL_NETWORKS: ignoring ${invalid.join(", ")}; ` +
+      'give networks as "address/prefix", e.g. 172.32.0.0/24.',
   );
 }
 
@@ -271,6 +285,7 @@ export default {
     await safely(strapi, "syncAdminFields", () => syncAdminFields(strapi));
     await safely(strapi, "syncEditorRole", () => syncEditorRole(strapi));
     warnIfProxyUntrusted(strapi);
+    warnIfInternalNetworksInvalid(strapi);
     warnIfRevalidationUnset(strapi);
 
     // Changing an image's alt text or replacing the file in the media library
