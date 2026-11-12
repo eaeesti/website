@@ -34,7 +34,19 @@ import {
 
 type Context = Parameters<Core.MiddlewareHandler>[0];
 
-const STATE_COOKIE = "strapi_google_login";
+/**
+ * The login's state and PKCE verifier, between leaving for Google and coming
+ * back. Over HTTPS it's a __Host- cookie, which browsers only accept from this
+ * host itself: another *.efektiivnealtruism.org site could otherwise plant a
+ * state it got from /google-login, and with it log a visitor in to the
+ * planter's own admin account. Browsers only take that prefix on secure
+ * cookies with path "/", so plain HTTP (development) keeps a plain name.
+ */
+function stateCookie(ctx: Context): { name: string; path: string } {
+  return secure(ctx)
+    ? { name: "__Host-strapi_google_login", path: "/" }
+    : { name: "strapi_google_login", path: GOOGLE_LOGIN_PATH };
+}
 
 /**
  * The cookies Strapi's own login sets, with Strapi's default names and path
@@ -104,13 +116,14 @@ const googleLogin: Core.MiddlewareFactory = (_config, { strapi }) => {
   const start = (ctx: Context, client: GoogleClient) => {
     const state = randomToken();
     const verifier = randomToken();
-    // Signed, so another site can't plant a state of its own (login CSRF).
-    ctx.cookies.set(STATE_COOKIE, stateCookieValue(state, verifier), {
+    // Signed, so its value can't be made up, and host-only (stateCookie).
+    const cookie = stateCookie(ctx);
+    ctx.cookies.set(cookie.name, stateCookieValue(state, verifier), {
       signed: true,
       httpOnly: true,
       secure: secure(ctx),
       sameSite: "lax",
-      path: GOOGLE_LOGIN_PATH,
+      path: cookie.path,
       maxAge: 10 * 60 * 1000,
       overwrite: true,
     });
@@ -130,13 +143,16 @@ const googleLogin: Core.MiddlewareFactory = (_config, { strapi }) => {
     ctx: Context,
     client: GoogleClient,
   ): Promise<{ email: string } | { error: GoogleLoginError }> => {
+    const cookie = stateCookie(ctx);
     const verifier = verifierForState(
-      ctx.cookies.get(STATE_COOKIE, { signed: true }),
+      ctx.cookies.get(cookie.name, { signed: true }),
       ctx.query.state,
     );
-    ctx.cookies.set(STATE_COOKIE, null, {
+    // Browsers ignore a __Host- cookie's removal unless it's secure too.
+    ctx.cookies.set(cookie.name, null, {
       signed: true,
-      path: GOOGLE_LOGIN_PATH,
+      secure: secure(ctx),
+      path: cookie.path,
     });
     if (ctx.query.error) return { error: "cancelled" };
     const code = ctx.query.code;

@@ -174,7 +174,7 @@ async function roundTrip(users: FakeUser[], email: string) {
     cookies: start.jar,
   });
   await run(fake.strapi, back.ctx);
-  return { ...fake, google, fetch, back };
+  return { ...fake, google, fetch, start, back };
 }
 
 describe("google-login middleware", () => {
@@ -218,6 +218,19 @@ describe("google-login middleware", () => {
         value: "access-token",
         options: { httpOnly: false, path: "/admin" },
       });
+    });
+
+    it("keeps the state in a host-only cookie over HTTPS", async () => {
+      vi.stubEnv("NODE_ENV", "production");
+      const { start, back } = await roundTrip([editor], editor.email);
+      // A __Host- cookie can't be planted by another subdomain's site.
+      expect(
+        cookie(start.setCookies, "__Host-strapi_google_login"),
+      ).toMatchObject({ options: { secure: true, httpOnly: true, path: "/" } });
+      expect(
+        cookie(back.setCookies, "__Host-strapi_google_login"),
+      ).toMatchObject({ value: null, options: { secure: true, path: "/" } });
+      expect(back.ctx.redirectedTo).toBe("/admin");
     });
 
     it("matches the address whatever its case", async () => {
