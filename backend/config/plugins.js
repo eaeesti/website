@@ -5,6 +5,26 @@ module.exports = ({ env }) => ({
   upload: {
     config: {
       sizeLimit: 25 * 1024 * 1024,
+      // Uploads are served from Strapi's own address (and the site's
+      // /uploads), so an uploaded web page or script would run there, next to
+      // the admin's session. Only media and documents, then. SVGs stay
+      // allowed: the content security policy keeps their inline scripts from
+      // running, and without uploaded scripts there's nothing else to load.
+      security: {
+        allowedTypes: [
+          "image/*",
+          "video/*",
+          "audio/*",
+          "application/pdf",
+          "text/plain",
+          "text/csv",
+          "application/msword",
+          "application/vnd.ms-excel",
+          "application/vnd.ms-powerpoint",
+          "application/vnd.openxmlformats-officedocument.*",
+          "application/vnd.oasis.opendocument.*",
+        ],
+      },
     },
   },
   email: {
