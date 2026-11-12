@@ -2,10 +2,11 @@
  * EA Estonia's branding in the admin: the logo on the login page and in the
  * menu, EA blue instead of Strapi's purple, and welcome texts that say where
  * editors are. The browser tab's icon is ../../favicon.png, which Strapi
- * serves as /favicon.ico.
+ * serves as /favicon.ico. Also the login page's Google button.
  */
 import type { StrapiApp } from "@strapi/strapi/admin";
 import icon from "./extensions/icon.png";
+import { showGoogleLogin } from "./google-login";
 import logo from "./extensions/logo.png";
 
 /** The site's palette (frontend/src/app/globals.css), in Strapi's names. */
@@ -41,6 +42,7 @@ export default {
       en: {
         "Auth.form.welcome.title": "EA Estonia's website",
         "Auth.form.welcome.subtitle": "Log in to edit efektiivnealtruism.org",
+        "Auth.form.button.login": "Log in with a password",
         "app.components.LeftMenu.navbrand.title": "EA Estonia",
         "app.components.LeftMenu.navbrand.workplace": "Website",
       },
@@ -49,5 +51,7 @@ export default {
     tutorials: false,
     notifications: { releases: false },
   },
-  bootstrap(_app: StrapiApp) {},
+  bootstrap(_app: StrapiApp) {
+    void showGoogleLogin();
+  },
 };

@@ -49,6 +49,9 @@ module.exports = ({ env }) => [
   "global::rate-limit",
   "strapi::query",
   "strapi::body",
+  // Admin login with Google, and passwords for Super Admins only. After the
+  // body parser: it reads the address the password routes are called with.
+  "global::google-login",
   "strapi::session",
   "strapi::favicon",
   "strapi::public",

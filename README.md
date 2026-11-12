@@ -85,6 +85,20 @@ Every change in Strapi calls the frontend's `/api/revalidate`, which clears its 
 
 The "Preview" button in the content manager opens the page in Next.js draft mode, showing unpublished changes. It needs the same `PREVIEW_SECRET` on both sides.
 
+### Logging in to the admin
+
+Editors log in with Google. Only Super Admins can also use a password, so nobody is locked out if Google login breaks.
+Google only confirms that someone owns an address; whether they get in is up to Strapi. To let someone in, add their
+Google address under Settings → Users and give them a role. They don't need the invite link: their first Google login
+activates the account. Any Google account works, an EA Estonia one or a personal Gmail address.
+
+Google login is on when `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` are set in the backend, from an OAuth client of
+type "Web application" in Google Cloud. Its authorised redirect URI is `PUBLIC_URL` followed by `/google-login/callback`,
+e.g. `https://strapi.efektiivnealtruism.org/google-login/callback`, or `http://localhost:1337/google-login/callback` for
+local development. Without them, everyone logs in with a password as before. Strapi's own SSO needs its Enterprise
+plan, so this is the project's own code: `backend/src/middlewares/google-login.ts`, and the button on the login page in
+`backend/src/admin/google-login.ts`.
+
 ### Production
 
 The frontend is built with `output: "standalone"`: `frontend/.next/standalone` is a self-contained server (`node frontend/server.js`, since this is a workspace) that needs `frontend/.next/static` copied to `.next/standalone/frontend/.next/static`. The build never talks to Strapi; every page is rendered on its first visit and cached after that.
