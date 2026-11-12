@@ -1,8 +1,31 @@
 import type { Metadata } from "next";
-import type { StrapiGlobal, StrapiMedia } from "@/types/generated/strapi";
+import type {
+  StrapiGlobal,
+  StrapiMedia,
+  StrapiPage,
+} from "@/types/generated/strapi";
 import type { Locale } from "./locale";
+import { isExternalUrl, siteUrl } from "./url";
+
+/** og:locale, as Facebook and others expect it. */
+const OPEN_GRAPH_LOCALES: Record<Locale, string> = { et: "et_EE", en: "en_US" };
+
+/**
+ * The photo a page opens with (its hero or header), to share the page with
+ * when it has no share image of its own.
+ */
+export function leadImage(
+  sections: StrapiPage["sections"] | null | undefined,
+): StrapiMedia | null {
+  const first = sections?.[0];
+  return first?.__component === "sections.hero-section" ||
+    first?.__component === "sections.header-section"
+    ? first.image
+    : null;
+}
 
 interface PageMetadataInput {
+  locale: Locale;
   /** Without the site name; the root layout's title template adds it. */
   title: string | null | undefined;
   description?: string | null;
@@ -20,6 +43,7 @@ interface PageMetadataInput {
 export function buildPageMetadata(
   global: StrapiGlobal | null,
   {
+    locale,
     title,
     description,
     image,
@@ -51,6 +75,13 @@ export function buildPageMetadata(
       title: isHome || !title ? siteName : title,
       description: resolvedDescription,
       url: path,
+      locale: OPEN_GRAPH_LOCALES[locale],
+      alternateLocale: Object.keys(languages ?? {})
+        .filter(
+          (code): code is Locale =>
+            code !== locale && code in OPEN_GRAPH_LOCALES,
+        )
+        .map((code) => OPEN_GRAPH_LOCALES[code]),
       ...(publishedTime ? { publishedTime } : {}),
       ...(shareImage
         ? {
@@ -66,4 +97,26 @@ export function buildPageMetadata(
         : {}),
     },
   };
+}
+
+/**
+ * Who runs the site, for search engines (schema.org), on the home page: its
+ * name, address, logo, email and social media accounts. "<" is escaped so no
+ * value can close the script tag.
+ */
+export function organizationJsonLd(global: StrapiGlobal | null): string {
+  const logo = global?.appleTouchIcon ?? global?.favicon;
+  const email = global?.footer?.email;
+  const data = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: global?.siteName ?? "Efektiivne Altruism Eesti",
+    url: siteUrl("/"),
+    ...(logo ? { logo: siteUrl(logo.url) } : {}),
+    ...(email ? { email } : {}),
+    sameAs: (global?.footer?.socialMediaLinks ?? [])
+      .map((link) => link.href.trim())
+      .filter(isExternalUrl),
+  };
+  return JSON.stringify(data).replace(/</g, "\\u003c");
 }

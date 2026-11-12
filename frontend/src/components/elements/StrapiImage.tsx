@@ -1,4 +1,4 @@
-import NextImage from "next/image";
+import NextImage, { type ImageProps } from "next/image";
 import type { StrapiMedia } from "@/types/generated/strapi";
 import type { BlocksImage } from "@/types/blocks";
 
@@ -7,7 +7,13 @@ interface StrapiImageProps {
   className?: string;
   /** Fill the positioned parent instead of using the image's own size. */
   fill?: boolean;
+  /**
+   * The page's main image, usually its largest (LCP): fetched at once and
+   * ahead of everything else.
+   */
   priority?: boolean;
+  /** Above the fold but not the main image, like the logo: fetched at once. */
+  eager?: boolean;
   /** The rendered width, for picking the right size, e.g. "(min-width: 1024px) 50vw, 100vw". */
   sizes?: string;
   /** Overrides the image's own alt text, e.g. "" for a decorative image. */
@@ -23,10 +29,18 @@ export default function StrapiImage({
   className,
   fill = false,
   priority = false,
+  eager = false,
   sizes,
   alt,
 }: StrapiImageProps) {
   if (!image?.url) return null;
+
+  // Next.js 16 deprecates `priority`, and recommends fetchPriority over its
+  // `preload` for the main image.
+  const loading: Pick<ImageProps, "loading" | "fetchPriority"> =
+    priority || eager
+      ? { loading: "eager", fetchPriority: priority ? "high" : undefined }
+      : {};
 
   const altText = alt ?? image.alternativeText ?? "";
   // SVGs are already resolution-independent; Next.js won't process them.
@@ -40,7 +54,7 @@ export default function StrapiImage({
         alt={altText}
         fill
         sizes={sizes ?? "100vw"}
-        priority={priority}
+        {...loading}
         unoptimized={unoptimized}
         className={className}
       />
@@ -56,7 +70,7 @@ export default function StrapiImage({
         width={0}
         height={0}
         sizes={sizes ?? "100vw"}
-        priority={priority}
+        {...loading}
         unoptimized={unoptimized}
         className={className}
         style={{ width: "auto", height: "auto", maxWidth: "100%" }}
@@ -71,7 +85,7 @@ export default function StrapiImage({
       width={image.width}
       height={image.height}
       sizes={sizes}
-      priority={priority}
+      {...loading}
       unoptimized={unoptimized}
       className={className}
     />

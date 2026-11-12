@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { categoryPath, postPath } from "@/utils/blog";
-import { LOCALES, pagePath } from "@/utils/locale";
+import { LOCALES } from "@/utils/locale";
+import { pageSitemapEntries } from "@/utils/sitemap";
 import { getCategories, getPageSlugs, getPostSlugs } from "@/utils/strapi";
 import { siteUrl } from "@/utils/url";
 
@@ -12,22 +13,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     Promise.all(
       LOCALES.map(async (locale) => ({
         locale,
-        slugs: await getPageSlugs(locale),
+        pages: await getPageSlugs(locale),
       })),
     ),
     getPostSlugs(),
     getCategories(),
   ]);
 
-  const pages = pagesByLocale.flatMap(({ locale, slugs }) =>
-    slugs.map((page) => ({
-      url: siteUrl(pagePath(page.slug, locale)),
-      lastModified: page.updatedAt ?? undefined,
-    })),
-  );
-
   return [
-    ...pages,
+    ...pageSitemapEntries(pagesByLocale),
     ...posts.map((post) => ({
       url: siteUrl(postPath(post.slug)),
       lastModified: post.updatedAt ?? undefined,

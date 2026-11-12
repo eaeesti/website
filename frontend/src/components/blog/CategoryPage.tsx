@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { BLOG_PATH, categoryPath, listingPagePath } from "@/utils/blog";
-import { buildPageMetadata } from "@/utils/seo";
+import { buildPageMetadata, leadImage } from "@/utils/seo";
 import {
   getCategories,
   getCategory,
@@ -93,14 +93,18 @@ export async function categoryMetadata({
   slug,
   page,
 }: CategoryPageProps): Promise<Metadata> {
-  const [global, category] = await Promise.all([
+  const [global, category, blogPage] = await Promise.all([
     getGlobal("et"),
     getCategory(slug),
+    getPage(BLOG_PATH.slice(1), "et"),
   ]);
   if (!category) return {};
   return buildPageMetadata(global, {
+    locale: "et",
     title: category.name,
     description: category.description,
+    // The blog page's header photo, which category pages show too.
+    image: leadImage(blogPage?.sections),
     path: listingPagePath(categoryPath(slug), page),
   });
 }

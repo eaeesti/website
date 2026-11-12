@@ -30,7 +30,7 @@ export default function Navbar({
     <StrapiImage
       image={navbar.logo}
       alt={siteName}
-      priority
+      eager
       sizes="24rem"
       className="h-10 w-auto transition-[height] duration-300 lg:h-[70px] lg:group-data-scrolled/nav:h-10"
     />

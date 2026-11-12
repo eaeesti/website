@@ -147,6 +147,7 @@ export async function blogPostMetadata(slug: string): Promise<Metadata> {
   const [global, post] = await Promise.all([getGlobal("et"), getPost(slug)]);
   if (!post) return {};
   return buildPageMetadata(global, {
+    locale: "et",
     title: post.metadata?.title ?? post.title,
     description: post.metadata?.description ?? post.excerpt,
     image: post.metadata?.shareImage ?? post.image,

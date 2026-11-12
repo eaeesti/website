@@ -209,13 +209,17 @@ export async function getPage(
   return response?.data?.[0] ?? null;
 }
 
+/** Every page's slug; Strapi adds the documentId to any list of fields. */
 export async function getPageSlugs(
   locale: Locale,
-): Promise<Pick<StrapiPage, "slug" | "updatedAt">[]> {
-  return collectAll<Pick<StrapiPage, "slug" | "updatedAt">>("/pages", {
-    locale,
-    fields: ["slug", "updatedAt"],
-  });
+): Promise<Pick<StrapiPage, "documentId" | "slug" | "updatedAt">[]> {
+  return collectAll<Pick<StrapiPage, "documentId" | "slug" | "updatedAt">>(
+    "/pages",
+    {
+      locale,
+      fields: ["slug", "updatedAt"],
+    },
+  );
 }
 
 // ── Blog ──────────────────────────────────────────────────────────────────────
