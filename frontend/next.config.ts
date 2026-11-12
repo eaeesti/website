@@ -66,6 +66,10 @@ const nextConfig: NextConfig = {
 
   reactCompiler: true,
 
+  // No "X-Powered-By: Next.js": nobody needs it, and it tells scanners which
+  // advisories to try.
+  poweredByHeader: false,
+
   images: {
     // Uploads are converted to WebP in the sizes the srcsets ask for. Their
     // file names include a hash, so a converted image can be kept a month.
