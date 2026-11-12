@@ -3,9 +3,10 @@
  * kept here so they can be tested. The middleware that uses them is
  * src/middlewares/google-login.ts.
  *
- * Google only confirms who someone is. Whether they get in is decided by
- * Strapi: their Google address must belong to an admin user that an
- * administrator added under Settings → Users.
+ * Google only confirms who someone is: an account of EA Estonia's Google
+ * Workspace, like the CRM's login. Whether they get in is decided by
+ * Strapi: their address must belong to an admin user that an administrator
+ * added under Settings → Users.
  */
 import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
 
@@ -22,23 +23,33 @@ export const TOKEN_ENDPOINT = "https://oauth2.googleapis.com/token";
 const ISSUERS = ["https://accounts.google.com", "accounts.google.com"];
 
 /** Why a Google login didn't end in the admin, as shown on the login page. */
-export type GoogleLoginError = "cancelled" | "failed" | "no-account";
+export type GoogleLoginError =
+  | "cancelled"
+  | "failed"
+  | "wrong-account"
+  | "no-account";
 
 export interface GoogleClient {
   clientId: string;
   clientSecret: string;
+  /** The Workspace's domain, e.g. "efektiivnealtruism.org". */
+  domain: string;
 }
 
 /**
- * The Google OAuth client, from GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET.
- * Without both, Google login is off and passwords work for everyone.
+ * The Google OAuth client, from GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET,
+ * and the Workspace from GOOGLE_WORKSPACE_DOMAIN (as in the CRM). Without
+ * the client, Google login is off and passwords work.
  */
 export function googleClient(
   env: Record<string, string | undefined>,
 ): GoogleClient | null {
   const clientId = env.GOOGLE_CLIENT_ID?.trim();
   const clientSecret = env.GOOGLE_CLIENT_SECRET?.trim();
-  return clientId && clientSecret ? { clientId, clientSecret } : null;
+  const domain = (
+    env.GOOGLE_WORKSPACE_DOMAIN?.trim() || "efektiivnealtruism.org"
+  ).toLowerCase();
+  return clientId && clientSecret ? { clientId, clientSecret, domain } : null;
 }
 
 export function randomToken(): string {
@@ -52,6 +63,7 @@ export function pkceChallenge(verifier: string): string {
 
 export function authorizationUrl(options: {
   clientId: string;
+  domain: string;
   redirectUri: string;
   state: string;
   verifier: string;
@@ -64,7 +76,9 @@ export function authorizationUrl(options: {
     state: options.state,
     code_challenge: pkceChallenge(options.verifier),
     code_challenge_method: "S256",
-    // People with several Google accounts pick the one with access.
+    // Google's account chooser offers only the Workspace's accounts. Only
+    // a hint: anyone can remove it, so the token is checked too.
+    hd: options.domain,
     prompt: "select_account",
   });
   return `${AUTHORIZATION_ENDPOINT}?${params.toString()}`;
@@ -94,40 +108,50 @@ export function verifierForState(
 }
 
 /**
- * The verified email address in an ID token, or null.
+ * The address in an ID token, if it's a verified address of the Workspace.
+ *
+ * Both the `hd` claim and the address must name the domain, as in the CRM:
+ * a personal Google account can carry any address, but only the Workspace
+ * that owns a domain can put it in `hd`.
  *
  * The signature isn't checked: the token comes straight from Google's token
  * endpoint over TLS, in exchange for this client's secret, which OpenID
  * Connect allows instead (Core 1.0, section 3.1.3.7). Who it's for, who
  * issued it and when it expires still are.
  */
-export function verifiedEmail(
+export function workspaceEmail(
   idToken: unknown,
-  clientId: string,
+  client: { clientId: string; domain: string },
   now: Date,
-): string | null {
-  if (typeof idToken !== "string") return null;
+): { email: string } | { error: "failed" | "wrong-account" } {
+  if (typeof idToken !== "string") return { error: "failed" };
   const payload = idToken.split(".")[1];
-  if (!payload) return null;
+  if (!payload) return { error: "failed" };
   let claims: unknown;
   try {
     claims = JSON.parse(Buffer.from(payload, "base64url").toString("utf8"));
   } catch {
-    return null;
+    return { error: "failed" };
   }
   const iss = claim(claims, "iss");
   const exp = claim(claims, "exp");
   const email = claim(claims, "email");
+  const hd = claim(claims, "hd");
   const valid =
     typeof iss === "string" &&
     ISSUERS.includes(iss) &&
-    claim(claims, "aud") === clientId &&
+    claim(claims, "aud") === client.clientId &&
     typeof exp === "number" &&
     exp * 1000 > now.getTime() &&
     claim(claims, "email_verified") === true &&
-    typeof email === "string" &&
-    email.includes("@");
-  return valid ? email : null;
+    typeof email === "string";
+  if (!valid) return { error: "failed" };
+  const address = email.toLowerCase();
+  const inWorkspace =
+    typeof hd === "string" &&
+    hd.toLowerCase() === client.domain &&
+    address.endsWith(`@${client.domain}`);
+  return inWorkspace ? { email: address } : { error: "wrong-account" };
 }
 
 /** A claim of a parsed token, which is untyped JSON. */

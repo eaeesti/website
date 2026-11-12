@@ -26,9 +26,10 @@ import {
   randomToken,
   stateCookieValue,
   TOKEN_ENDPOINT,
-  verifiedEmail,
   verifierForState,
+  workspaceEmail,
   type GoogleClient,
+  type GoogleLoginError,
 } from "../utils/google-login";
 
 type Context = Parameters<Core.MiddlewareHandler>[0];
@@ -44,21 +45,16 @@ const REFRESH_COOKIE = "strapi_admin_refresh";
 const ACCESS_COOKIE = "jwtToken";
 const ADMIN_COOKIE_PATH = "/admin";
 
-const SUPER_ADMIN = "strapi-super-admin";
-
-/**
- * The admin routes that log in or set a password, and the field of their
- * request body that identifies the user.
- */
-const PASSWORD_ROUTES = new Map([
-  ["/admin/login", "email"],
-  ["/admin/forgot-password", "email"],
-  ["/admin/register", "registrationToken"],
-  ["/admin/reset-password", "resetPasswordToken"],
+/** The admin routes that log in or set a password. */
+const PASSWORD_ROUTES = new Set([
+  "/admin/login",
+  "/admin/register",
+  "/admin/reset-password",
+  "/admin/forgot-password",
 ]);
 
 const PASSWORD_REFUSED =
-  "Editors log in with Google: use the “Log in with Google” button above.";
+  "Passwords are turned off: log in with the “Log in with Google” button.";
 
 interface AdminUser {
   id: number;
@@ -66,10 +62,9 @@ interface AdminUser {
   blocked: boolean | null;
   /** Set while an invited user hasn't registered. */
   registrationToken: string | null;
-  roles: { code: string }[];
 }
 
-/** A property of a request body, which is untyped. */
+/** A property of parsed JSON, which is untyped. */
 function field(body: unknown, name: string): unknown {
   if (!body || typeof body !== "object") return undefined;
   return Object.entries(body).find(([key]) => key === name)?.[1];
@@ -80,16 +75,7 @@ function secure(ctx: Context): boolean {
   return process.env.NODE_ENV === "production" && ctx.request.secure;
 }
 
-function isSuperAdmin(user: AdminUser): boolean {
-  return user.roles.some((role) => role.code === SUPER_ADMIN);
-}
-
 function refusePassword(ctx: Context) {
-  if (ctx.path === "/admin/forgot-password") {
-    // Strapi's own answer, so it doesn't reveal the account; no email.
-    ctx.status = 204;
-    return;
-  }
   ctx.status = 403;
   ctx.body = {
     data: null,
@@ -106,7 +92,7 @@ const googleLogin: Core.MiddlewareFactory = (_config, { strapi }) => {
   const findUser = async (where: Record<string, unknown>) =>
     (await strapi.db
       .query("admin::user")
-      .findOne({ where, populate: ["roles"] })) as AdminUser | null;
+      .findOne({ where })) as AdminUser | null;
 
   const redirectUri = (ctx: Context) => {
     const base = strapi.config.get<string>("server.url") || ctx.origin;
@@ -129,6 +115,7 @@ const googleLogin: Core.MiddlewareFactory = (_config, { strapi }) => {
     ctx.redirect(
       authorizationUrl({
         clientId: client.clientId,
+        domain: client.domain,
         redirectUri: redirectUri(ctx),
         state,
         verifier,
@@ -136,11 +123,11 @@ const googleLogin: Core.MiddlewareFactory = (_config, { strapi }) => {
     );
   };
 
-  /** The Google account's verified address, or why there isn't one. */
+  /** The Google account's Workspace address, or why there isn't one. */
   const googleEmail = async (
     ctx: Context,
     client: GoogleClient,
-  ): Promise<string | "cancelled" | "failed"> => {
+  ): Promise<{ email: string } | { error: GoogleLoginError }> => {
     const verifier = verifierForState(
       ctx.cookies.get(STATE_COOKIE, { signed: true }),
       ctx.query.state,
@@ -149,9 +136,9 @@ const googleLogin: Core.MiddlewareFactory = (_config, { strapi }) => {
       signed: true,
       path: GOOGLE_LOGIN_PATH,
     });
-    if (ctx.query.error) return "cancelled";
+    if (ctx.query.error) return { error: "cancelled" };
     const code = ctx.query.code;
-    if (!verifier || typeof code !== "string") return "failed";
+    if (!verifier || typeof code !== "string") return { error: "failed" };
 
     const response = await fetch(TOKEN_ENDPOINT, {
       method: "POST",
@@ -167,24 +154,31 @@ const googleLogin: Core.MiddlewareFactory = (_config, { strapi }) => {
     });
     if (!response.ok) {
       strapi.log.warn(`Google login: token request got ${response.status}`);
-      return "failed";
+      return { error: "failed" };
     }
     const tokens: unknown = await response.json();
-    const email = verifiedEmail(
+    const result = workspaceEmail(
       field(tokens, "id_token"),
-      client.clientId,
+      client,
       new Date(),
     );
-    if (!email) strapi.log.warn("Google login: no verified address in token");
-    return email ?? "failed";
+    if ("error" in result) {
+      strapi.log.warn(
+        result.error === "wrong-account"
+          ? "Google login: not an account of the Workspace"
+          : "Google login: no valid, verified address in the token",
+      );
+    }
+    return result;
   };
 
   const callback = async (ctx: Context, client: GoogleClient) => {
-    const email = await googleEmail(ctx, client);
-    if (email === "cancelled" || email === "failed") {
-      ctx.redirect(loginPageWithError(email));
+    const result = await googleEmail(ctx, client);
+    if ("error" in result) {
+      ctx.redirect(loginPageWithError(result.error));
       return;
     }
+    const { email } = result;
     const user = await findUser({ email: { $eqi: email } });
     // Inactive without a registration token: an administrator switched the
     // user off, so they stay out.
@@ -231,25 +225,10 @@ const googleLogin: Core.MiddlewareFactory = (_config, { strapi }) => {
     ctx.redirect("/admin");
   };
 
-  /**
-   * Whether a request to one of the admin's password routes may go on: only
-   * for Super Admins, and for addresses with no account (those get Strapi's
-   * usual answer, so the routes don't tell who has an account).
-   */
-  const passwordAllowed = async (ctx: Context, key: string) => {
-    const value = field(ctx.request.body, key);
-    // Strapi's own validation answers malformed requests.
-    if (typeof value !== "string" || !value) return true;
-    const user = await findUser(
-      key === "email" ? { email: { $eqi: value } } : { [key]: value },
-    );
-    return !user || isSuperAdmin(user);
-  };
-
   return async (ctx, next) => {
     const client = googleClient(process.env);
     if (ctx.method === "GET" && ctx.path === GOOGLE_STATUS_PATH) {
-      ctx.body = { enabled: Boolean(client) };
+      ctx.body = { enabled: Boolean(client), domain: client?.domain ?? null };
       return;
     }
     if (!client) return next();
@@ -269,12 +248,9 @@ const googleLogin: Core.MiddlewareFactory = (_config, { strapi }) => {
       }
       return;
     }
-    const passwordKey = PASSWORD_ROUTES.get(ctx.path);
-    if (ctx.method === "POST" && passwordKey) {
-      if (!(await passwordAllowed(ctx, passwordKey))) {
-        refusePassword(ctx);
-        return;
-      }
+    if (ctx.method === "POST" && PASSWORD_ROUTES.has(ctx.path)) {
+      refusePassword(ctx);
+      return;
     }
     return next();
   };

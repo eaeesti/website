@@ -9,9 +9,7 @@ interface FakeUser {
   email: string;
   isActive: boolean;
   blocked: boolean;
-  registrationToken?: string;
-  resetPasswordToken?: string;
-  roles: { code: string }[];
+  registrationToken: string | null;
 }
 
 const editor: FakeUser = {
@@ -19,36 +17,30 @@ const editor: FakeUser = {
   email: "mari@efektiivnealtruism.org",
   isActive: true,
   blocked: false,
-  resetPasswordToken: "reset-editor",
-  roles: [{ code: "strapi-editor" }],
+  registrationToken: null,
 };
 const invited: FakeUser = {
   id: 3,
-  email: "jaan@gmail.com",
+  email: "jaan@efektiivnealtruism.org",
   isActive: false,
   blocked: false,
   registrationToken: "invite-jaan",
-  roles: [{ code: "strapi-editor" }],
-};
-const superAdmin: FakeUser = {
-  id: 1,
-  email: "andri@efektiivnealtruism.org",
-  isActive: true,
-  blocked: false,
-  roles: [{ code: "strapi-super-admin" }],
 };
 
 function part(value: unknown): string {
   return Buffer.from(JSON.stringify(value)).toString("base64url");
 }
 
+/** As Google issues them: only Workspace accounts carry `hd`. */
 function idToken(email: string): string {
+  const domain = email.split("@")[1]?.toLowerCase();
   const claims = {
     iss: "https://accounts.google.com",
     aud: CLIENT_ID,
     exp: Date.now() / 1000 + 3600,
     email,
     email_verified: true,
+    ...(domain === "efektiivnealtruism.org" ? { hd: domain } : {}),
   };
   return `${part({ alg: "RS256" })}.${part(claims)}.signature`;
 }
@@ -203,6 +195,7 @@ describe("google-login middleware", () => {
         "https://cms.example/google-login/callback",
       );
       expect(google.searchParams.get("code_challenge")).toBeTruthy();
+      expect(google.searchParams.get("hd")).toBe("efektiivnealtruism.org");
       // The token request proves it holds the verifier behind the challenge.
       const [, request] = fetch.mock.calls[0];
       expect(request.body.get("code")).toBe("auth-code");
@@ -255,8 +248,19 @@ describe("google-login middleware", () => {
       expect(sessions.generateRefreshToken).not.toHaveBeenCalled();
     });
 
+    it("turns away accounts outside the Workspace", async () => {
+      const { back, sessions } = await roundTrip([editor], "mari@gmail.com");
+      expect(back.ctx.redirectedTo).toBe(
+        "/admin/auth/login?google-login=wrong-account",
+      );
+      expect(sessions.generateRefreshToken).not.toHaveBeenCalled();
+    });
+
     it("turns away addresses without an account, and blocked users", async () => {
-      const stranger = await roundTrip([editor], "someone@gmail.com");
+      const stranger = await roundTrip(
+        [editor],
+        "someone@efektiivnealtruism.org",
+      );
       expect(stranger.back.ctx.redirectedTo).toBe(
         "/admin/auth/login?google-login=no-account",
       );
@@ -301,54 +305,20 @@ describe("google-login middleware", () => {
   });
 
   describe("passwords", () => {
-    it("refuses an editor's password login", async () => {
-      const { strapi } = fakeStrapi([editor, superAdmin]);
-      const { ctx } = fakeContext({
-        method: "POST",
-        path: "/admin/login",
-        body: { email: editor.email, password: "x" },
-      });
-      const next = await run(strapi, ctx);
-      expect(next).not.toHaveBeenCalled();
+    it.each([
+      ["/admin/login", { email: editor.email, password: "x" }],
+      ["/admin/login", { email: "nobody@example.com", password: "x" }],
+      ["/admin/forgot-password", { email: editor.email }],
+      ["/admin/reset-password", { resetPasswordToken: "t", password: "x" }],
+      ["/admin/register", { registrationToken: "invite-jaan" }],
+    ])("refuses %s, for everyone", async (path, body) => {
+      const { strapi } = fakeStrapi([editor, invited]);
+      const { ctx } = fakeContext({ method: "POST", path, body });
+      expect(await run(strapi, ctx)).not.toHaveBeenCalled();
       expect(ctx.status).toBe(403);
       expect(ctx.body).toMatchObject({
         error: { message: expect.stringContaining("Google") },
       });
-    });
-
-    it("lets Super Admins and unknown addresses through to Strapi", async () => {
-      const { strapi } = fakeStrapi([editor, superAdmin]);
-      for (const email of [superAdmin.email, "nobody@example.com"]) {
-        const { ctx } = fakeContext({
-          method: "POST",
-          path: "/admin/login",
-          body: { email, password: "x" },
-        });
-        expect(await run(strapi, ctx)).toHaveBeenCalled();
-      }
-    });
-
-    it("sends editors no reset email, with Strapi's usual answer", async () => {
-      const { strapi } = fakeStrapi([editor]);
-      const { ctx } = fakeContext({
-        method: "POST",
-        path: "/admin/forgot-password",
-        body: { email: editor.email },
-      });
-      expect(await run(strapi, ctx)).not.toHaveBeenCalled();
-      expect(ctx.status).toBe(204);
-    });
-
-    it("refuses editors' reset and invite links", async () => {
-      const { strapi } = fakeStrapi([editor, invited]);
-      for (const [path, body] of [
-        ["/admin/reset-password", { resetPasswordToken: "reset-editor" }],
-        ["/admin/register", { registrationToken: "invite-jaan" }],
-      ] as const) {
-        const { ctx } = fakeContext({ method: "POST", path, body });
-        expect(await run(strapi, ctx)).not.toHaveBeenCalled();
-        expect(ctx.status).toBe(403);
-      }
     });
   });
 
@@ -368,7 +338,7 @@ describe("google-login middleware", () => {
 
       const status = fakeContext({ path: "/google-login/enabled" });
       await run(strapi, status.ctx);
-      expect(status.ctx.body).toEqual({ enabled: false });
+      expect(status.ctx.body).toEqual({ enabled: false, domain: null });
 
       const start = fakeContext({ path: "/google-login" });
       expect(await run(strapi, start.ctx)).toHaveBeenCalled();

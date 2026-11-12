@@ -42,7 +42,6 @@ export default {
       en: {
         "Auth.form.welcome.title": "EA Estonia's website",
         "Auth.form.welcome.subtitle": "Log in to edit efektiivnealtruism.org",
-        "Auth.form.button.login": "Log in with a password",
         "app.components.LeftMenu.navbrand.title": "EA Estonia",
         "app.components.LeftMenu.navbrand.workplace": "Website",
       },

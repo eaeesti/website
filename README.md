@@ -87,17 +87,19 @@ The "Preview" button in the content manager opens the page in Next.js draft mode
 
 ### Logging in to the admin
 
-Editors log in with Google. Only Super Admins can also use a password, so nobody is locked out if Google login breaks.
-Google only confirms that someone owns an address; whether they get in is up to Strapi. To let someone in, add their
-Google address under Settings → Users and give them a role. They don't need the invite link: their first Google login
-activates the account. Any Google account works, an EA Estonia one or a personal Gmail address.
+People log in with their EA Estonia Google account (an `@efektiivnealtruism.org` address), like in the CRM. Google only
+confirms who someone is; whether they get in is up to Strapi. To let someone in, add their address under Settings →
+Users and give them a role. They don't need the invite link: their first Google login activates the account.
 
 Google login is on when `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` are set in the backend, from an OAuth client of
 type "Web application" in Google Cloud. Its authorised redirect URI is `PUBLIC_URL` followed by `/google-login/callback`,
 e.g. `https://strapi.efektiivnealtruism.org/google-login/callback`, or `http://localhost:1337/google-login/callback` for
-local development. Without them, everyone logs in with a password as before. Strapi's own SSO needs its Enterprise
-plan, so this is the project's own code: `backend/src/middlewares/google-login.ts`, and the button on the login page in
-`backend/src/admin/google-login.ts`.
+local development. `GOOGLE_WORKSPACE_DOMAIN` names the Workspace and defaults to `efektiivnealtruism.org`.
+
+While it's on, passwords are turned off for everyone: the login page shows only the Google button, and the admin's
+password routes refuse all requests. If Google login ever breaks, remove the two settings and restart Strapi to log in
+with a password again. Strapi's own SSO needs its Enterprise plan, so this is the project's own code:
+`backend/src/middlewares/google-login.ts`, and the login page's button in `backend/src/admin/google-login.ts`.
 
 ### Production
 

@@ -25,7 +25,7 @@ src/
 ├── api/              # content types (schema.json) + controllers/routes/services
 ├── components/       # section, element and meta components
 ├── middlewares/
-│   ├── google-login.ts # admin login with Google; passwords for Super Admins only
+│   ├── google-login.ts # admin login with Google; passwords off while it's on
 │   └── rate-limit.ts
 └── utils/
     ├── contact.ts      # contact form validation and the notification email
@@ -48,7 +48,7 @@ scripts/                # one-off imports from the old Webflow site, via the RES
 - **Rich text** fields use the Blocks editor (`"type": "blocks"`), never Markdown.
 - **Admin labels**: `src/admin-fields.ts` sets every field's label and help text in the content manager on each boot, overwriting edits made under "Configure the view". Add a hint there when you add a field whose purpose isn't obvious from its name.
 - **Editor role**: `src/editor-role.ts` rebuilds the Editor role's permissions on each boot: all content in every language and field, media without deleting, contact messages; no Email settings or admin settings. Edits to the role in the admin are overwritten.
-- **Admin login**: with `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` set, `src/middlewares/google-login.ts` logs admin users in with Google (`/google-login`), creating the same session Strapi's own login does, and refuses the password routes (`/admin/login`, `register`, `reset-password`, `forgot-password`) to everyone but Super Admins. It relies on Strapi's session manager and its default admin cookie names; check it after Strapi upgrades. The login page's button is added to the DOM by `src/admin/google-login.ts`, since Strapi has no slot for it.
+- **Admin login**: with `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` set, `src/middlewares/google-login.ts` logs admin users in with their Google Workspace account (`/google-login`, domain from `GOOGLE_WORKSPACE_DOMAIN`), creating the same session Strapi's own login does, and refuses the admin's password routes (`/admin/login`, `register`, `reset-password`, `forgot-password`) for everyone. It relies on Strapi's session manager and its default admin cookie names; check it after Strapi upgrades. The login page's button, in place of the password form, is added to the DOM by `src/admin/google-login.ts`, since Strapi has no slot for it.
 - **Scripts don't restart `pnpm dev`**: `scripts/` is in `watchIgnoreFiles` (config/admin.js), so imports can run against the dev server while you edit them.
 - **Everything in Strapi is in English**: display names, descriptions, field defaults, messages. Only content in the `et` locale is Estonian. Frontend type names come from the UID, so renaming a display name is safe; renaming a file or attribute is not.
 

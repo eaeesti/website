@@ -6,11 +6,12 @@ import {
   loginPageWithError,
   pkceChallenge,
   stateCookieValue,
-  verifiedEmail,
   verifierForState,
+  workspaceEmail,
 } from "../google-login";
 
 const CLIENT_ID = "123.apps.googleusercontent.com";
+const CLIENT = { clientId: CLIENT_ID, domain: "efektiivnealtruism.org" };
 const NOW = new Date("2026-11-12T12:00:00Z");
 
 function part(value: unknown): string {
@@ -25,6 +26,7 @@ function idToken(claims: Record<string, unknown>): string {
     exp: NOW.getTime() / 1000 + 3600,
     email: "mari@efektiivnealtruism.org",
     email_verified: true,
+    hd: "efektiivnealtruism.org",
     ...claims,
   })}.signature`;
 }
@@ -36,19 +38,34 @@ describe("googleClient", () => {
         GOOGLE_CLIENT_ID: " id ",
         GOOGLE_CLIENT_SECRET: "secret",
       }),
-    ).toEqual({ clientId: "id", clientSecret: "secret" });
+    ).toEqual({
+      clientId: "id",
+      clientSecret: "secret",
+      domain: "efektiivnealtruism.org",
+    });
     expect(googleClient({ GOOGLE_CLIENT_ID: "id" })).toBeNull();
     expect(
       googleClient({ GOOGLE_CLIENT_ID: "id", GOOGLE_CLIENT_SECRET: " " }),
     ).toBeNull();
   });
+
+  it("takes the Workspace's domain from GOOGLE_WORKSPACE_DOMAIN", () => {
+    expect(
+      googleClient({
+        GOOGLE_CLIENT_ID: "id",
+        GOOGLE_CLIENT_SECRET: "secret",
+        GOOGLE_WORKSPACE_DOMAIN: " Example.ORG ",
+      })?.domain,
+    ).toBe("example.org");
+  });
 });
 
 describe("authorizationUrl", () => {
-  it("asks for the address only, with PKCE", () => {
+  it("asks for a Workspace address only, with PKCE", () => {
     const url = new URL(
       authorizationUrl({
         clientId: CLIENT_ID,
+        domain: "efektiivnealtruism.org",
         redirectUri: "https://cms.example/google-login/callback",
         state: "state",
         verifier: "verifier",
@@ -65,6 +82,7 @@ describe("authorizationUrl", () => {
       state: "state",
       code_challenge: pkceChallenge("verifier"),
       code_challenge_method: "S256",
+      hd: "efektiivnealtruism.org",
     });
   });
 
@@ -91,14 +109,32 @@ describe("verifierForState", () => {
   });
 });
 
-describe("verifiedEmail", () => {
-  it("reads the verified address", () => {
-    expect(verifiedEmail(idToken({}), CLIENT_ID, NOW)).toBe(
-      "mari@efektiivnealtruism.org",
-    );
+describe("workspaceEmail", () => {
+  it("reads a verified address of the Workspace", () => {
+    expect(workspaceEmail(idToken({}), CLIENT, NOW)).toEqual({
+      email: "mari@efektiivnealtruism.org",
+    });
     expect(
-      verifiedEmail(idToken({ iss: "accounts.google.com" }), CLIENT_ID, NOW),
-    ).toBe("mari@efektiivnealtruism.org");
+      workspaceEmail(
+        idToken({
+          iss: "accounts.google.com",
+          email: "Mari@EfektiivneAltruism.org",
+        }),
+        CLIENT,
+        NOW,
+      ),
+    ).toEqual({ email: "mari@efektiivnealtruism.org" });
+  });
+
+  it.each([
+    ["a personal account", { email: "mari@gmail.com", hd: undefined }],
+    ["a personal account with the domain's address", { hd: undefined }],
+    ["another Workspace", { email: "mari@example.org", hd: "example.org" }],
+    ["another of the Workspace's domains", { email: "mari@example.org" }],
+  ])("tells %s to use the Workspace account", (_, claims) => {
+    expect(workspaceEmail(idToken(claims), CLIENT, NOW)).toEqual({
+      error: "wrong-account",
+    });
   });
 
   it.each([
@@ -108,13 +144,15 @@ describe("verifiedEmail", () => {
     ["an unverified address", { email_verified: false }],
     ["a missing address", { email: undefined }],
   ])("refuses %s", (_, claims) => {
-    expect(verifiedEmail(idToken(claims), CLIENT_ID, NOW)).toBeNull();
+    expect(workspaceEmail(idToken(claims), CLIENT, NOW)).toEqual({
+      error: "failed",
+    });
   });
 
   it("refuses what isn't a token", () => {
-    expect(verifiedEmail(undefined, CLIENT_ID, NOW)).toBeNull();
-    expect(verifiedEmail("nonsense", CLIENT_ID, NOW)).toBeNull();
-    expect(verifiedEmail("a.!!!.c", CLIENT_ID, NOW)).toBeNull();
+    for (const token of [undefined, "nonsense", "a.!!!.c"]) {
+      expect(workspaceEmail(token, CLIENT, NOW)).toEqual({ error: "failed" });
+    }
   });
 });
 

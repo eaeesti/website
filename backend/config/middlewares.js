@@ -21,6 +21,9 @@ function frontendOrigins(env) {
 module.exports = ({ env }) => [
   "strapi::logger",
   "strapi::errors",
+  // Brotli or gzip, for the admin's 5 MB script above all: uncompressed it
+  // took seconds to load. Browsers then keep it until the next deploy.
+  "strapi::compression",
   {
     name: "strapi::security",
     config: {
@@ -49,8 +52,7 @@ module.exports = ({ env }) => [
   "global::rate-limit",
   "strapi::query",
   "strapi::body",
-  // Admin login with Google, and passwords for Super Admins only. After the
-  // body parser: it reads the address the password routes are called with.
+  // Admin login with Google instead of passwords, once it's configured.
   "global::google-login",
   "strapi::session",
   "strapi::favicon",
