@@ -102,20 +102,20 @@ e.g. `https://strapi.efektiivnealtruism.org/google-login/callback`, or `http://l
 local development. `GOOGLE_WORKSPACE_DOMAIN` names the Workspace and defaults to `efektiivnealtruism.org`.
 
 While it's on, passwords are turned off for everyone: the login page shows only the Google button, and the admin's
-password routes refuse all requests, in any case and with or without a trailing slash, as Strapi's router matches them. If Google login ever breaks, remove the two settings and restart Strapi to log in
-with a password again. Strapi's own SSO needs its Enterprise plan, so this is the project's own code:
+password routes refuse all requests, however the address is written (Strapi's router ignores case and a trailing
+slash). If Google login ever breaks, remove the two settings and restart Strapi to log in with a password again. Strapi's own SSO needs its Enterprise plan, so this is the project's own code:
 `backend/src/middlewares/google-login.ts`, and the login page's button in `backend/src/admin/google-login.ts`.
 
 ### Production
 
-The frontend is built with `output: "standalone"`: `frontend/.next/standalone` is a self-contained server (`node frontend/server.js`, since this is a workspace) that needs `frontend/.next/static` copied to `.next/standalone/frontend/.next/static`. The build never talks to Strapi; every page is rendered on its first visit and cached after that.
+Both apps run as Docker images built from `deploy/strapi.Dockerfile` and `deploy/site.Dockerfile`, for linux/amd64, with the repo root as the build context. The code is compiled on the build machine's own architecture and only the dependencies are installed for the target, since compiling under emulation is very slow. Builds need more memory than the 2 GB server has (around 1.8 GB for Strapi's admin panel and 1.4 GB for Next.js), so the server only runs the images. The site's build never talks to Strapi; every page is rendered on its first visit and cached after that.
 
-Builds need more memory than the 2 GB server has (around 1.8 GB for Strapi's admin panel and 1.4 GB for Next.js), so they run in CI and the server only runs the results.
+Outside Docker, `next build` makes a self-contained server instead (`output: "standalone"`): `frontend/.next/standalone/frontend/server.js`, which needs `frontend/.next/static` copied to `.next/standalone/frontend/.next/static`.
 
 Environment variables are read at two different times:
 
 - **At build time**, inlined into the build: `NEXT_PUBLIC_STRAPI_URL`, `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_DONATION_API_URL` (optional, defaults to Anneta Targalt's production API), and `STRAPI_URL`, which `next.config.ts` uses for the `/uploads` proxy.
-- **At runtime**, from the server's environment: `STRAPI_API_TOKEN`, `STRAPI_URL`, `REVALIDATE_SECRET`, `PREVIEW_SECRET`, `PLAUSIBLE_DOMAIN`.
+- **At runtime**, from the server's environment: `STRAPI_API_TOKEN`, `STRAPI_URL`, `REVALIDATE_SECRET`, `PREVIEW_SECRET`, `PLAUSIBLE_DOMAIN`, `UMAMI_WEBSITE_ID`.
 
 Uploaded files are stored in `backend/public/uploads`, so back that directory up along with the database.
 

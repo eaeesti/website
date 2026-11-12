@@ -1,5 +1,5 @@
-# Strapi for a preview of the site.
-# Built on the Mac for linux/amd64 by deploy/preview/deploy.sh; build context: the repo root.
+# Strapi's production image, for linux/amd64. Build context: the repo root.
+# docker buildx build --platform linux/amd64 -f deploy/strapi.Dockerfile .
 # The admin panel and server code are compiled natively ($BUILDPLATFORM): under emulation that takes
 # ages. Only the dependencies are installed for the target, so native ones (sharp) match it.
 FROM --platform=$BUILDPLATFORM node:24-alpine AS build

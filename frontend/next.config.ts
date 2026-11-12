@@ -57,11 +57,11 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
-  // A self-contained server in .next/standalone, built in CI and copied to
-  // the VPS, so the server never needs the frontend's node_modules. As this
-  // is a pnpm workspace, the server is at .next/standalone/frontend/server.js.
-  // The production image runs `next start` instead, because it's
-  // built on another CPU architecture than it runs on, and turns this off.
+  // A self-contained server in .next/standalone, which needs no node_modules.
+  // As this is a pnpm workspace, it's at .next/standalone/frontend/server.js.
+  // The production image (deploy/site.Dockerfile) runs `next start` instead,
+  // because it's built on another CPU architecture than it runs on, and turns
+  // this off.
   output: process.env.NEXT_STANDALONE === "false" ? undefined : "standalone",
 
   reactCompiler: true,

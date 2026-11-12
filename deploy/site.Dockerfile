@@ -1,5 +1,5 @@
-# Next.js for a preview of the site.
-# Built on the Mac for linux/amd64 by deploy/preview/deploy.sh; build context: the repo root.
+# The site's production image (Next.js), for linux/amd64. Build context: the repo root.
+# docker buildx build --platform linux/amd64 -f deploy/site.Dockerfile --build-arg NEXT_PUBLIC_SITE_URL=… .
 # The site is built natively ($BUILDPLATFORM), which is much faster than under emulation; only the
 # dependencies are installed for the target, so the native ones (sharp, SWC) match it.
 FROM --platform=$BUILDPLATFORM node:24-alpine AS build
@@ -11,7 +11,7 @@ COPY frontend/package.json frontend/
 RUN pnpm install --frozen-lockfile --fail-if-no-match --filter ./frontend
 COPY frontend frontend
 # Inlined at build time: where browsers reach the site and Strapi, and where
-# the server's /uploads proxy goes (the strapi container, on the stack's network).
+# the server fetches content and proxies /uploads from (STRAPI_URL).
 ARG NEXT_PUBLIC_SITE_URL
 ARG NEXT_PUBLIC_STRAPI_URL
 ARG STRAPI_URL=http://strapi:1337
