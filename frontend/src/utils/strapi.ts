@@ -109,6 +109,22 @@ async function strapiFetch<T>(
   return (await response.json()) as StrapiResponse<T>;
 }
 
+/**
+ * An uploaded file (/uploads/…) from Strapi, cached like the content that
+ * links to it. Null for anything else, or if it can't be fetched.
+ */
+export async function getUpload(url: string): Promise<ArrayBuffer | null> {
+  if (!url.startsWith("/uploads/")) return null;
+  try {
+    const response = await fetch(`${strapiUrl()}${url}`, {
+      next: { tags: [CACHE_TAG], revalidate: FALLBACK_REVALIDATE_SECONDS },
+    });
+    return response.ok ? await response.arrayBuffer() : null;
+  } catch {
+    return null;
+  }
+}
+
 // ── Populate shapes ───────────────────────────────────────────────────────────
 
 const METADATA_POPULATE = { populate: { shareImage: true } };

@@ -31,6 +31,7 @@ src/
 │   ├── (en)/en/[[...slug]]/      # English CMS pages, root layout <html lang="en">
 │   ├── api/revalidate/           # called by Strapi after content changes
 │   ├── api/preview/              # draft mode on (from Strapi) and off (exit/)
+│   ├── og/                       # share cards: et|en/[[...slug]], blogi/[slug], rubriik/[slug]
 │   └── sitemap.ts, robots.ts
 ├── components/
 │   ├── CmsPage.tsx               # fetches a page and renders its sections
@@ -49,6 +50,7 @@ src/
 ## Data and caching
 
 - Every Strapi fetch goes through `strapiFetch()` in `utils/strapi.ts`, tagged `strapi` with a one-hour fallback revalidation. `/api/revalidate` expires the tag immediately (`revalidateTag(tag, { expire: 0 })`).
+- Link previews (`og:image`) are share cards, drawn per page by the routes in `app/og/` with `next/og` and cached like the pages: the page's title on its top photo or a post's cover, in the hero's style (`utils/share-card.ts`, `share-card-image.tsx`). Satori can't read WebP, WOFF2 or variable fonts, so photos are converted with sharp and the fonts are static WOFF files from `@fontsource`. A card's address carries a hash of its content, so sites refetch it after an edit. A share image set in Strapi replaces the card.
 - Routes return `[]` from `generateStaticParams`, so the build never contacts Strapi and pages are rendered and cached on first visit. Don't use `searchParams`, `cookies()` or `headers()` in pages: they make the route dynamic and turn off caching. Pagination is in the path (`/lk/2`) for this reason.
 - In draft mode (`draftMode()`), fetches skip the cache and request `status=draft` for content types that have drafts (`hasDrafts: true`).
 - Strapi runs on the same machine; the server reaches it at `STRAPI_URL` (loopback). Browsers only call Strapi for the contact form (`NEXT_PUBLIC_STRAPI_URL`).

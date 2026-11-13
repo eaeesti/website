@@ -5,6 +5,11 @@ import type { StrapiBlogPost, StrapiGlobal } from "@/types/generated/strapi";
 import { BLOG_PATH, bylineText, postPath } from "@/utils/blog";
 import { formatDate } from "@/utils/date";
 import { buildPageMetadata } from "@/utils/seo";
+import {
+  postShareCard,
+  postShareCardPath,
+  shareCardImage,
+} from "@/utils/share-card";
 import { getGlobal, getPost, getRelatedPosts } from "@/utils/strapi";
 import { siteUrl } from "@/utils/url";
 import Anchor from "../elements/Anchor";
@@ -150,7 +155,9 @@ export async function blogPostMetadata(slug: string): Promise<Metadata> {
     locale: "et",
     title: post.metadata?.title ?? post.title,
     description: post.metadata?.description ?? post.excerpt,
-    image: post.metadata?.shareImage ?? post.image,
+    image:
+      post.metadata?.shareImage ??
+      shareCardImage(postShareCardPath(post.slug), postShareCard(post, global)),
     path: postPath(post.slug),
     type: "article",
     publishedTime: post.date,

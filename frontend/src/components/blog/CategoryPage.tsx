@@ -1,7 +1,12 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { BLOG_PATH, categoryPath, listingPagePath } from "@/utils/blog";
-import { buildPageMetadata, leadImage } from "@/utils/seo";
+import { buildPageMetadata } from "@/utils/seo";
+import {
+  categoryShareCard,
+  categoryShareCardPath,
+  shareCardImage,
+} from "@/utils/share-card";
 import {
   getCategories,
   getCategory,
@@ -103,8 +108,10 @@ export async function categoryMetadata({
     locale: "et",
     title: category.name,
     description: category.description,
-    // The blog page's header photo, which category pages show too.
-    image: leadImage(blogPage?.sections),
+    image: shareCardImage(
+      categoryShareCardPath(slug),
+      categoryShareCard(category, blogPage, global),
+    ),
     path: listingPagePath(categoryPath(slug), page),
   });
 }

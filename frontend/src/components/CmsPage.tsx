@@ -5,7 +5,12 @@ import { listingPagePath } from "@/utils/blog";
 import type { Locale } from "@/utils/locale";
 import { isLocale, pagePath, slugFromSegments } from "@/utils/locale";
 import { parseListingSegments } from "@/utils/route";
-import { buildPageMetadata, leadImage, organizationJsonLd } from "@/utils/seo";
+import { buildPageMetadata, organizationJsonLd } from "@/utils/seo";
+import {
+  pageShareCard,
+  pageShareCardPath,
+  shareCardImage,
+} from "@/utils/share-card";
 import { getGlobal, getPage, getPosts } from "@/utils/strapi";
 import SiteShell from "./layout/SiteShell";
 import Sections from "./sections/Sections";
@@ -117,11 +122,12 @@ export async function cmsPageMetadata({
     locale,
     title: page.metadata?.title ?? page.name,
     description: page.metadata?.description,
-    // The home page has its own share card (SITE_SHARE_IMAGES) rather
-    // than the bare hero photo.
     image:
       page.metadata?.shareImage ??
-      (slug === "/" ? null : leadImage(page.sections)),
+      shareCardImage(
+        pageShareCardPath(slug, locale),
+        pageShareCard(page, global),
+      ),
     path: listingPagePath(pagePath(slug, locale), route.pageNumber),
     languages: route.pageNumber === 1 ? languagePaths(page, locale) : undefined,
     isHome: slug === "/" && !page.metadata?.title,

@@ -63,7 +63,8 @@ const HINTS: Record<string, Record<string, FieldHint>> = {
     },
     metadata: {
       label: "Default SEO and sharing",
-      description: "Used by pages that don't set their own.",
+      description:
+        "The description is used by pages that don't set their own. The share image goes behind the share cards of pages without a photo.",
     },
     favicon: {
       description:
@@ -495,7 +496,7 @@ const HINTS: Record<string, Record<string, FieldHint>> = {
     },
     shareImage: {
       description:
-        "Shown when the page is shared on social media: a JPEG or PNG, 1200×630 pixels (some sites don't show WebP). Without one, a page is shared with its top photo; the home page, and pages without a photo, with the default from Site settings or else the site's own share card.",
+        "Usually empty: link previews show a card the site makes from the page's title and top photo. An image here replaces that card: a JPEG or PNG, 1200×630 pixels (some sites don't show WebP).",
     },
   },
   "meta.navbar": {
