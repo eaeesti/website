@@ -22,7 +22,8 @@ export default function HeroSection({
             alt=""
             fill
             priority={context.isFirst}
-            className="-z-10 object-cover"
+            // A little above the middle, where people's faces usually are.
+            className="-z-10 object-cover object-[center_40%]"
           />
           <div
             className="absolute inset-0 -z-10 bg-primary-900/70"
@@ -30,8 +31,10 @@ export default function HeroSection({
           />
         </>
       )}
-      {/* Fills the window (up to 900px), under the transparent navbar. */}
-      <div className="mx-auto flex min-h-[min(100svh,900px)] max-w-5xl flex-col items-center justify-center px-4 pt-[calc(var(--nav-height)+3rem)] pb-16 text-center">
+      {/* Fills the window, under the transparent navbar, up to 900px or half
+          the window's width, whichever is more: a wide but short hero would
+          crop the photo down to a strip and cut off people's heads. */}
+      <div className="mx-auto flex min-h-[min(100svh,max(900px,50vw))] max-w-5xl flex-col items-center justify-center px-4 pt-[calc(var(--nav-height)+3rem)] pb-16 text-center">
         <h1 className="text-5xl font-extrabold tracking-tight text-balance text-white sm:text-7xl">
           {title}
         </h1>
