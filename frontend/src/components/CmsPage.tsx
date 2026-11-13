@@ -117,7 +117,11 @@ export async function cmsPageMetadata({
     locale,
     title: page.metadata?.title ?? page.name,
     description: page.metadata?.description,
-    image: page.metadata?.shareImage ?? leadImage(page.sections),
+    // The home page has its own share card (SITE_SHARE_IMAGES) rather
+    // than the bare hero photo.
+    image:
+      page.metadata?.shareImage ??
+      (slug === "/" ? null : leadImage(page.sections)),
     path: listingPagePath(pagePath(slug, locale), route.pageNumber),
     languages: route.pageNumber === 1 ? languagePaths(page, locale) : undefined,
     isHome: slug === "/" && !page.metadata?.title,

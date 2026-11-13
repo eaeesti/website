@@ -495,7 +495,7 @@ const HINTS: Record<string, Record<string, FieldHint>> = {
     },
     shareImage: {
       description:
-        "Shown when the page is shared on social media. 1200×630 pixels works best.",
+        "Shown when the page is shared on social media: a JPEG or PNG, 1200×630 pixels (some sites don't show WebP). Without one, a page is shared with its top photo; the home page, and pages without a photo, with the default from Site settings or else the site's own share card.",
     },
   },
   "meta.navbar": {

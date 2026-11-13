@@ -10,6 +10,32 @@ import { isExternalUrl, siteUrl } from "./url";
 /** og:locale, as Facebook and others expect it. */
 const OPEN_GRAPH_LOCALES: Record<Locale, string> = { et: "et_EE", en: "en_US" };
 
+type ShareImage = Pick<
+  StrapiMedia,
+  "url" | "width" | "height" | "alternativeText"
+>;
+
+/**
+ * The site's own share cards (public/share/): the home page's hero at
+ * 1200×630. The home page is shared with them, and so is any page with no
+ * image of its own or in Site settings. Sites cache link previews by the
+ * image's address, so give a changed card a new file name.
+ */
+export const SITE_SHARE_IMAGES: Record<Locale, ShareImage> = {
+  et: {
+    url: "/share/et.jpg",
+    width: 1200,
+    height: 630,
+    alternativeText: "Efektiivne Altruism Eesti: Teeme head paremini!",
+  },
+  en: {
+    url: "/share/en.jpg",
+    width: 1200,
+    height: 630,
+    alternativeText: "Effective Altruism Estonia: Let’s do good better!",
+  },
+};
+
 /**
  * The photo a page opens with (its hero or header), to share the page with
  * when it has no share image of its own.
@@ -29,7 +55,7 @@ interface PageMetadataInput {
   /** Without the site name; the root layout's title template adds it. */
   title: string | null | undefined;
   description?: string | null;
-  image?: StrapiMedia | null;
+  image?: ShareImage | null;
   /** The page's canonical path. */
   path: string;
   /** The same page in each language that has it. */
@@ -55,7 +81,8 @@ export function buildPageMetadata(
   }: PageMetadataInput,
 ): Metadata {
   const siteName = global?.siteName ?? "Efektiivne Altruism Eesti";
-  const shareImage = image ?? global?.metadata?.shareImage;
+  const shareImage =
+    image ?? global?.metadata?.shareImage ?? SITE_SHARE_IMAGES[locale];
   const resolvedDescription =
     description ?? global?.metadata?.description ?? undefined;
 
@@ -83,18 +110,14 @@ export function buildPageMetadata(
         )
         .map((code) => OPEN_GRAPH_LOCALES[code]),
       ...(publishedTime ? { publishedTime } : {}),
-      ...(shareImage
-        ? {
-            images: [
-              {
-                url: shareImage.url,
-                width: shareImage.width ?? undefined,
-                height: shareImage.height ?? undefined,
-                alt: shareImage.alternativeText ?? undefined,
-              },
-            ],
-          }
-        : {}),
+      images: [
+        {
+          url: shareImage.url,
+          width: shareImage.width ?? undefined,
+          height: shareImage.height ?? undefined,
+          alt: shareImage.alternativeText ?? undefined,
+        },
+      ],
     },
   };
 }
