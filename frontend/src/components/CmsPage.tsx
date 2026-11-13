@@ -83,16 +83,18 @@ export default async function CmsPage({ locale, segments }: CmsPageProps) {
       path={listingPagePath(path, route.pageNumber)}
       alternatePath={otherLanguages[0]?.[1] ?? null}
     >
+      <Sections
+        sections={page.sections}
+        context={{ locale, global, path, pageNumber: route.pageNumber }}
+      />
+      {/* After the sections: the navbar is only transparent over a header
+          that is <main>'s first child (globals.css). */}
       {slug === "/" && (
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: organizationJsonLd(global) }}
         />
       )}
-      <Sections
-        sections={page.sections}
-        context={{ locale, global, path, pageNumber: route.pageNumber }}
-      />
     </SiteShell>
   );
 }
