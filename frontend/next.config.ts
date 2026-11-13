@@ -66,6 +66,14 @@ const nextConfig: NextConfig = {
 
   reactCompiler: true,
 
+  experimental: {
+    // Rendered pages and fetched data are cached in memory only. The
+    // production container is read-only but for .next/cache, and Next would
+    // otherwise log an error each time it tried to save a page under
+    // .next/server.
+    isrFlushToDisk: false,
+  },
+
   // No "X-Powered-By: Next.js": nobody needs it, and it tells scanners which
   // advisories to try.
   poweredByHeader: false,
