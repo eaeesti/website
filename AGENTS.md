@@ -29,6 +29,7 @@ See [backend/AGENTS.md](backend/AGENTS.md) and [frontend/AGENTS.md](frontend/AGE
 2. Run `pnpm generate-types`.
 3. Add its populate shape to `SECTIONS_POPULATE` in `frontend/src/utils/strapi.ts`.
 4. Create the component in `frontend/src/components/sections/` and add it to the switch in `Sections.tsx`.
+5. Add its Markdown to `sectionMarkdown()` in `frontend/src/utils/page-markdown.ts` (type-checking fails until you do).
 
 ## TypeScript Conventions
 

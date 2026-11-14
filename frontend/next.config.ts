@@ -100,6 +100,14 @@ const nextConfig: NextConfig = {
         source: "/uploads/:path*",
         destination: `${strapiUrl}/uploads/:path*`,
       },
+      // Each page's Markdown version, for AI agents: its address with .md
+      // added, index.md for a home page (markdownPath() in utils/markdown.ts).
+      { source: "/index.md", destination: "/md/et" },
+      { source: "/en/index.md", destination: "/md/en" },
+      { source: "/blogi/:slug.md", destination: "/md/blogi/:slug" },
+      { source: "/rubriik/:slug.md", destination: "/md/rubriik/:slug" },
+      { source: "/en/:path*.md", destination: "/md/en/:path*" },
+      { source: "/:path*.md", destination: "/md/et/:path*" },
     ];
   },
 

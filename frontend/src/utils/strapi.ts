@@ -5,6 +5,7 @@ import type {
   StrapiBlogCategory,
   StrapiBlogPost,
   StrapiGlobal,
+  StrapiMetadata,
   StrapiPage,
 } from "@/types/generated/strapi";
 import type { Locale } from "./locale";
@@ -243,6 +244,19 @@ export async function getPageSlugs(
   );
 }
 
+export interface PageSummary extends Pick<StrapiPage, "name" | "slug"> {
+  metadata: Pick<StrapiMetadata, "title" | "description"> | null;
+}
+
+/** Every page's name, slug and description, for llms.txt. */
+export async function getPageSummaries(locale: Locale): Promise<PageSummary[]> {
+  return collectAll<PageSummary>("/pages", {
+    locale,
+    fields: ["name", "slug"],
+    populate: { metadata: { fields: ["title", "description"] } },
+  });
+}
+
 // ── Blog ──────────────────────────────────────────────────────────────────────
 
 export interface PostListing {
@@ -281,6 +295,23 @@ export async function getPosts({
       total: 0,
     },
   };
+}
+
+/**
+ * Every post, newest first, or every post in a category: for the Markdown
+ * versions of the pages, which list them all instead of a page at a time.
+ */
+export async function getAllPosts(
+  categorySlug?: string,
+): Promise<StrapiBlogPost[]> {
+  return collectAll<StrapiBlogPost>("/blog-posts", {
+    fields: POST_LIST_FIELDS,
+    populate: POST_LIST_POPULATE,
+    sort: ["date:desc", "id:desc"],
+    ...(categorySlug
+      ? { filters: { categories: { slug: { $eq: categorySlug } } } }
+      : {}),
+  });
 }
 
 export async function getPost(slug: string): Promise<StrapiBlogPost | null> {

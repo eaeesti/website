@@ -32,6 +32,8 @@ src/
 │   ├── api/revalidate/           # called by Strapi after content changes
 │   ├── api/preview/              # draft mode on (from Strapi) and off (exit/)
 │   ├── og/                       # share cards: et|en/[[...slug]], blogi/[slug], rubriik/[slug]
+│   ├── md/                       # Markdown versions of the pages, same layout as og/
+│   ├── llms.txt/                 # lists the Markdown versions (llmstxt.org)
 │   └── sitemap.ts, robots.ts
 ├── components/
 │   ├── CmsPage.tsx               # fetches a page and renders its sections
@@ -54,6 +56,7 @@ src/
 - Routes return `[]` from `generateStaticParams`, so the build never contacts Strapi and pages are rendered and cached on first visit. Don't use `searchParams`, `cookies()` or `headers()` in pages: they make the route dynamic and turn off caching. Pagination is in the path (`/lk/2`) for this reason.
 - In draft mode (`draftMode()`), fetches skip the cache and request `status=draft` for content types that have drafts (`hasDrafts: true`).
 - Strapi runs on the same machine; the server reaches it at `STRAPI_URL` (loopback). Browsers only call Strapi for the contact form (`NEXT_PUBLIC_STRAPI_URL`).
+- Every page has a Markdown version for AI agents at its address with `.md` added (`/index.md`, `/en/index.md` for the home pages), rewritten in `next.config.ts` to the routes in `app/md/` and cached like the pages. It's built from the same sections (`utils/page-markdown.ts`, with `utils/markdown.ts` for rich text), so it needs nothing in Strapi; forms become links to their page, listings show every post, and email addresses keep their `[ät]`. Pages point to it with `<link rel="alternate" type="text/markdown">`, and `/llms.txt` lists them all.
 - Two sections read other sites' feeds on the server, cached on their own timers: the podcast's RSS (`utils/podcast.ts`, an hour) and the public Google Calendar (`utils/calendar.ts`, 15 minutes; repeating events are expanded with ical.js, times shown in Tallinn).
 - Uploaded images are served from `/uploads/…`, which `next.config.ts` rewrites to Strapi, so `next/image` treats them as local images.
 

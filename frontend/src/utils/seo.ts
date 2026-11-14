@@ -5,6 +5,7 @@ import type {
   StrapiPage,
 } from "@/types/generated/strapi";
 import type { Locale } from "./locale";
+import { markdownPath } from "./markdown";
 import { isExternalUrl, siteUrl } from "./url";
 
 /** og:locale, as Facebook and others expect it. */
@@ -43,6 +44,8 @@ interface PageMetadataInput {
   image: ShareImage;
   /** The page's canonical path. */
   path: string;
+  /** The path its Markdown version is named after (no /lk/2 suffix). */
+  basePath?: string;
   /** The same page in each language that has it. */
   languages?: Partial<Record<Locale, string>>;
   /** Show only the site name as the title, e.g. on the home page. */
@@ -59,6 +62,7 @@ export function buildPageMetadata(
     description,
     image,
     path,
+    basePath = path,
     languages,
     isHome = false,
     type = "website",
@@ -78,6 +82,8 @@ export function buildPageMetadata(
         ? // Estonian is the default for visitors whose language isn't listed.
           { languages: { ...languages, "x-default": languages.et } }
         : {}),
+      // Tells AI agents where the page's Markdown version is.
+      types: { "text/markdown": markdownPath(basePath) },
     },
     openGraph: {
       type,

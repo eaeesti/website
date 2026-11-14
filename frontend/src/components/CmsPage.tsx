@@ -129,6 +129,7 @@ export async function cmsPageMetadata({
         pageShareCard(page, global),
       ),
     path: listingPagePath(pagePath(slug, locale), route.pageNumber),
+    basePath: pagePath(slug, locale),
     languages: route.pageNumber === 1 ? languagePaths(page, locale) : undefined,
     isHome: slug === "/" && !page.metadata?.title,
   });

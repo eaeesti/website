@@ -113,5 +113,6 @@ export async function categoryMetadata({
       categoryShareCard(category, blogPage, global),
     ),
     path: listingPagePath(categoryPath(slug), page),
+    basePath: categoryPath(slug),
   });
 }

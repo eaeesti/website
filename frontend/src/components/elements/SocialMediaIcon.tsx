@@ -90,6 +90,11 @@ const icons: Record<
   },
 };
 
+/** "Facebook" for "facebook", for text where the icon can't go. */
+export function socialMediaName(type: string | null): string | null {
+  return type && icons[type] ? icons[type].name : null;
+}
+
 export default function SocialMediaIcon({ type }: { type: string | null }) {
   if (!type || !icons[type]) return null;
   const Icon = icons[type].icon;
