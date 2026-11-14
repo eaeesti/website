@@ -1,5 +1,6 @@
 # The site's production image (Next.js), for linux/amd64. Build context: the repo root.
-# docker buildx build --platform linux/amd64 -f deploy/site.Dockerfile --build-arg NEXT_PUBLIC_SITE_URL=… .
+# docker buildx build --platform linux/amd64 -f deploy/site.Dockerfile \
+#   --build-arg NEXT_PUBLIC_SITE_URL=… --build-arg NEXT_PUBLIC_STRAPI_URL=… .
 # The site is built natively ($BUILDPLATFORM), which is much faster than under emulation; only the
 # dependencies are installed for the target, so the native ones (sharp, SWC) match it.
 FROM --platform=$BUILDPLATFORM node:24-alpine AS build
@@ -20,6 +21,11 @@ ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL \
     STRAPI_URL=$STRAPI_URL \
     NEXT_STANDALONE=false \
     NEXT_TELEMETRY_DISABLED=1
+# Without them the site builds and then fails at runtime: every page's
+# metadata needs the site's address, and the contact form Strapi's.
+RUN if [ -z "$NEXT_PUBLIC_SITE_URL" ] || [ -z "$NEXT_PUBLIC_STRAPI_URL" ]; then \
+      echo "Pass --build-arg NEXT_PUBLIC_SITE_URL=… and NEXT_PUBLIC_STRAPI_URL=…" >&2; exit 1; \
+    fi
 RUN pnpm --fail-if-no-match --filter ./frontend build
 
 FROM node:24-alpine

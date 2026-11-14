@@ -1,26 +1,21 @@
 import type { NextConfig } from "next";
 import { DONATION_API_URL } from "./src/utils/donation";
 import { EMBED_ORIGINS } from "./src/utils/embed";
+import { strapiPublicUrl } from "./src/utils/url";
 
 // Where the Next.js server reaches Strapi (loopback in production).
-const strapiUrl = process.env.STRAPI_URL ?? "http://127.0.0.1:1337";
+const strapiUrl = process.env.STRAPI_URL || "http://127.0.0.1:1337";
 
 // Where browsers reach Strapi: the contact form posts there, and the content
 // manager on that origin frames the site for previews.
-const strapiPublicOrigin = (() => {
-  try {
-    return new URL(process.env.NEXT_PUBLIC_STRAPI_URL ?? "").origin;
-  } catch {
-    return "https://cms.efektiivnealtruism.org";
-  }
-})();
+const strapiPublicOrigin = new URL(strapiPublicUrl()).origin;
+
+// The donation form posts to Anneta Targalt's backend.
+const donationApiOrigin = new URL(DONATION_API_URL).origin;
 
 // Dev needs eval (React's callstack rebuilding, source maps) and a websocket
 // for HMR. Both are added only here, so `next build && next start` locally
 // still exercises the production policy.
-// The donation form posts to Anneta Targalt's backend.
-const donationApiOrigin = new URL(DONATION_API_URL).origin;
-
 const isDev = process.env.NODE_ENV !== "production";
 
 // Blog posts and pages are written by editors in Strapi. The blocks renderer

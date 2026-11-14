@@ -114,7 +114,7 @@ Outside Docker, `next build` makes a self-contained server instead (`output: "st
 
 Environment variables are read at two different times:
 
-- **At build time**, inlined into the build: `NEXT_PUBLIC_STRAPI_URL`, `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_DONATION_API_URL` (optional, defaults to Anneta Targalt's production API), and `STRAPI_URL`, which `next.config.ts` uses for the `/uploads` proxy.
+- **At build time**, inlined into the build: `NEXT_PUBLIC_STRAPI_URL`, `NEXT_PUBLIC_SITE_URL` (the Docker build stops without either), `NEXT_PUBLIC_DONATION_API_URL` (optional, defaults to Anneta Targalt's production API), and `STRAPI_URL`, which `next.config.ts` uses for the `/uploads` proxy.
 - **At runtime**, from the server's environment: `STRAPI_API_TOKEN`, `STRAPI_URL`, `REVALIDATE_SECRET`, `PREVIEW_SECRET`, `PLAUSIBLE_DOMAIN`, `UMAMI_WEBSITE_ID`.
 
 Uploaded files are stored in `backend/public/uploads`, so back that directory up along with the database.

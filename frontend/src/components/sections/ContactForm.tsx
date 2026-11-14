@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { CheckCircleIcon } from "@heroicons/react/24/outline";
+import { strapiPublicUrl } from "@/utils/url";
 import { buttonClasses } from "../elements/Button";
 
 interface ContactFormProps {
@@ -30,14 +31,11 @@ export default function ContactForm({ labels }: ContactFormProps) {
     const form = event.currentTarget;
     setStatus("sending");
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/contact`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(Object.fromEntries(new FormData(form))),
-        },
-      );
+      const response = await fetch(`${strapiPublicUrl()}/api/contact`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(Object.fromEntries(new FormData(form))),
+      });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       form.reset();
       setStatus("sent");
