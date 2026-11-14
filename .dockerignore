@@ -6,7 +6,6 @@
 **/.env.*
 !**/.env.example
 backend/public/uploads
-backend/scripts/.webflow-cache
 backend/.tmp
 .git
 **/.DS_Store

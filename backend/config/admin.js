@@ -19,10 +19,6 @@ module.exports = ({ env }) => {
     auth: {
       secret: env("ADMIN_JWT_SECRET"),
     },
-    // Editing the import scripts shouldn't restart `pnpm dev`. The watcher
-    // matches absolute paths, and this file runs from dist/config, so a
-    // pattern relative to either wouldn't match.
-    watchIgnoreFiles: [/[\\/]scripts[\\/]/],
     apiToken: {
       salt: env("API_TOKEN_SALT"),
     },

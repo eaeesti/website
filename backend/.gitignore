@@ -116,5 +116,3 @@ build
 .strapi-updater.json
 .strapi
 
-# Pages downloaded by scripts/import-webflow.mjs
-scripts/.webflow-cache

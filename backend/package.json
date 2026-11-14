@@ -10,11 +10,9 @@
     "dev": "node ../scripts/generate-strapi-types.mjs && strapi develop",
     "start": "strapi start",
     "strapi": "strapi",
-    "import:webflow": "node scripts/import-webflow.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
-    "type-check": "tsc --noEmit",
-    "import:pages": "node scripts/import-pages.mjs"
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "@strapi/plugin-users-permissions": "5.62.0",
@@ -31,8 +29,6 @@
     "@strapi/typescript-utils": "5.62.0",
     "@types/koa": "^2.15.0",
     "@types/node": "^25.3.3",
-    "cheerio": "^1.2.0",
-    "sharp": "^0.35.5",
     "typescript": "5.9.3",
     "vite": "^8.3.2",
     "vitest": "^4.1.11"

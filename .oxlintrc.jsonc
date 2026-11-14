@@ -15,7 +15,6 @@
     "**/.strapi/**",
     "**/types/generated/**",
     "backend/public/**",
-    "backend/scripts/.webflow-cache/**",
     // Plausible's and Umami's trackers, pinned copies of their minified files,
     // kept byte for byte.
     "frontend/public/js/plausible-*-[0-9]*.js",

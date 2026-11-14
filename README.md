@@ -51,8 +51,6 @@ The site is at http://localhost:3003. Development uses ports 1338 and 3003 so it
 
 A new database is empty, so every page of the site is a 404 until there's content. Either create a page in Strapi with the slug `/` (the home page) and add sections to it, or ask a maintainer for a copy of the live site's content: a database dump without contact form messages or login sessions, and the `backend/public/uploads` folder. Load the dump with `psql -d efektiivnealtruism -f <file>.sql` into an empty database, and put the files in `backend/public/uploads`. Then create yourself an admin account or set a password as described under [Logging in to the admin](#logging-in-to-the-admin), then regenerate the "Public API Token" under Settings → API Tokens and put the new key in `frontend/.env` as `STRAPI_API_TOKEN` (the copy's token was made with another server's keys).
 
-The scripts in `backend/scripts/` (`pnpm import:pages`, `pnpm import:webflow`) moved the content over from the old Webflow site in 2026. That site is gone, so they're kept only as a record of how the content was converted.
-
 ## How it works
 
 ### Content
