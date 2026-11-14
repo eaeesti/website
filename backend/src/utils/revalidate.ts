@@ -9,15 +9,26 @@ const PRIVATE_CONTENT_TYPES = new Set<string>([
   "api::email-config.email-config",
 ]);
 
-/** Document Service actions that can change what the site shows. */
-const WRITE_ACTIONS = new Set<string>([
-  "create",
-  "update",
-  "delete",
-  "publish",
-  "unpublish",
-  "discardDraft",
-]);
+/**
+ * Document Service actions that can change what the site shows. For content
+ * types with drafts, saving a draft changes nothing the site shows (previews
+ * skip the cache), so only these count; create and update count too when
+ * they publish in the same call, as the REST API's do unless asked for a
+ * draft.
+ */
+const PUBLISHED_CHANGES = new Set<string>(["publish", "unpublish", "delete"]);
+
+/** For content types without drafts, every write is live at once. */
+const WRITES = new Set<string>(["create", "update", "delete"]);
+
+export interface DocumentWrite {
+  uid: string;
+  action: string;
+  /** The content type has drafts (draftAndPublish). */
+  hasDrafts: boolean;
+  /** The `status` parameter of the call, if any. */
+  status?: unknown;
+}
 
 /**
  * Publishing several entries at once fires one write per entry. Waiting a
@@ -27,11 +38,17 @@ const DEBOUNCE_MS = 500;
 
 let pending: NodeJS.Timeout | null = null;
 
-export function affectsPublicSite(uid: string, action: string): boolean {
+export function affectsPublicSite({
+  uid,
+  action,
+  hasDrafts,
+  status,
+}: DocumentWrite): boolean {
+  if (!uid.startsWith("api::") || PRIVATE_CONTENT_TYPES.has(uid)) return false;
+  if (!hasDrafts) return WRITES.has(action);
   return (
-    uid.startsWith("api::") &&
-    !PRIVATE_CONTENT_TYPES.has(uid) &&
-    WRITE_ACTIONS.has(action)
+    PUBLISHED_CHANGES.has(action) ||
+    ((action === "create" || action === "update") && status === "published")
   );
 }
 

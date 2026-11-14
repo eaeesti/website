@@ -272,10 +272,20 @@ function warnIfRevalidationUnset(strapi: Core.Strapi): void {
 
 export default {
   register({ strapi }: { strapi: Core.Strapi }) {
-    // Tell the frontend to refresh after any change to public content.
+    // Tell the frontend to refresh after any change to what it shows.
     strapi.documents.use(async (context, next) => {
       const result = await next();
-      if (affectsPublicSite(context.uid, context.action)) {
+      if (
+        affectsPublicSite({
+          uid: context.uid,
+          action: context.action,
+          hasDrafts: Boolean(context.contentType.options?.draftAndPublish),
+          status:
+            context.params && "status" in context.params
+              ? context.params.status
+              : null,
+        })
+      ) {
         scheduleFrontendRevalidation(strapi);
       }
       return result;

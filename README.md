@@ -81,7 +81,7 @@ In rich text, a paragraph containing nothing but a YouTube, Vimeo or Spotify lin
 
 ### Publishing and preview
 
-Every change in Strapi calls the frontend's `/api/revalidate`, which clears its page cache, so the next visitor gets the new version (see `backend/src/utils/revalidate.ts`). This needs `FRONTEND_REVALIDATE_URL` and `REVALIDATE_SECRET` in the backend and the same `REVALIDATE_SECRET` in the frontend. Without them, cached pages still refresh within an hour.
+Every publish in Strapi (and any change to content without drafts, like the site settings) calls the frontend's `/api/revalidate`, which clears its page cache, so the next visitor gets the new version (see `backend/src/utils/revalidate.ts`). This needs `FRONTEND_REVALIDATE_URL` and `REVALIDATE_SECRET` in the backend and the same `REVALIDATE_SECRET` in the frontend. Without them, cached pages still refresh within an hour.
 
 The "Preview" button in the content manager opens the page in Next.js draft mode, showing unpublished changes. It needs the same `PREVIEW_SECRET` on both sides.
 
