@@ -1,11 +1,21 @@
 # Efektiivne Altruism Eesti
 
-The website of MTÜ Efektiivne Altruism Eesti, replacing the old Webflow site at https://www.efektiivnealtruism.org/.
+The website of MTÜ Efektiivne Altruism Eesti (Effective Altruism Estonia), at https://efektiivnealtruism.org.
 
 - **Backend**: [Strapi 5](https://strapi.io/) (TypeScript, Postgres) in `backend/`. Editors manage pages, the blog and site settings here.
 - **Frontend**: [Next.js 16](https://nextjs.org/) and [Tailwind CSS 4](https://tailwindcss.com/) in `frontend/`.
 
 Both run on one small VPS. Pages are cached by Next.js and refreshed the moment something is published in Strapi, so the site is fast without a CDN and editors see their changes right away.
+
+The people who edit the site are volunteers, not developers. Most of what's here exists to keep Strapi simple and hard to break for them: pages are built from fixed sections rather than free layout, and every field has a label and a hint in plain English.
+
+### Finding your way around
+
+- [AGENTS.md](AGENTS.md): the constraints the project works within, the commands, and how to add a page section.
+- [backend/AGENTS.md](backend/AGENTS.md): the Strapi side: content types, the bootstrap code, caching, rate limits and login.
+- [frontend/AGENTS.md](frontend/AGENTS.md): the Next.js side: routes, data fetching and caching, and the conventions components follow.
+
+They're written for AI coding assistants as much as for people, so they're short and specific; read them before changing something in that part of the code.
 
 ## Setup
 
@@ -33,19 +43,15 @@ pnpm dev
 
 On its first start Strapi creates the Estonian and English locales and a read-only API token for the frontend, and writes `frontend/.env` with that token and the shared secrets.
 
-5\. Open http://localhost:1338/admin and create your admin account.
+5\. Open http://localhost:1338/admin and create your admin account. Locally you log in with an email and password; Google login is only for production (see [Logging in to the admin](#logging-in-to-the-admin)).
 
-6\. Optionally, import the old site's content. Both scripts need a full-access API token: in Strapi, go to Settings → API Tokens → Create new API Token, type "Full access".
+The site is at http://localhost:3003. Development uses ports 1338 and 3003 so it can run next to other projects on the usual 1337 and 3000.
 
-```sh
-cd backend
-STRAPI_TOKEN=... pnpm import:pages    # every page in both languages, the navbar and footer
-STRAPI_TOKEN=... pnpm import:webflow  # every blog post, with images, categories and authors
-```
+### Content to work with
 
-They read the public site, keep a copy of each page in `backend/scripts/.webflow-cache`, and skip anything that already exists, so they are safe to run again. `REPLACE=1` makes `import:pages` overwrite pages instead, and `ONLY=/meist,/en/about` limits it to some of them. Pass `STRAPI_URL=...` to point either at another Strapi, such as production.
+A new database is empty, so every page of the site is a 404 until there's content. Either create a page in Strapi with the slug `/` (the home page) and add sections to it, or ask a maintainer for a copy of the live site's content: a database dump without contact form messages or login sessions, and the `backend/public/uploads` folder. After loading a copy, create yourself an admin account or set a password as described under [Logging in to the admin](#logging-in-to-the-admin), then regenerate the "Public API Token" under Settings → API Tokens and put the new key in `frontend/.env` as `STRAPI_API_TOKEN` (the copy's token was made with another server's keys).
 
-The site is at http://localhost:3003.
+The scripts in `backend/scripts/` (`pnpm import:pages`, `pnpm import:webflow`) moved the content over from the old Webflow site in 2026. That site is gone, so they're kept only as a record of how the content was converted.
 
 ## How it works
 
@@ -87,7 +93,7 @@ The "Preview" button in the content manager opens the page in Next.js draft mode
 
 ### Logging in to the admin
 
-People log in with their EA Estonia Google account (an `@efektiivnealtruism.org` address), like in the CRM. Google only
+In production, people log in with their EA Estonia Google account (an `@efektiivnealtruism.org` address). Google only
 confirms who someone is; whether they get in is up to Strapi. To let someone in, add their address under Settings →
 Users and give them a role. They don't need the invite link: their first Google login activates the account.
 
@@ -127,6 +133,8 @@ Uploaded files are stored in `backend/public/uploads`, so back that directory up
 
 In production, view the frontend's API token in Strapi under Settings → API Tokens. This requires `ENCRYPTION_KEY` to be set.
 
+Deploying is done by the maintainers. Changes reach the live site only after one of them deploys them.
+
 ## Tests, linting and formatting
 
 ```sh
@@ -135,3 +143,17 @@ pnpm type-check
 pnpm lint          # oxlint
 pnpm format:check  # oxfmt; `pnpm format` fixes
 ```
+
+All four should pass before a change is merged.
+
+## Contributing
+
+- Work on a branch and open a pull request. Say what the change is for, and include a screenshot when it changes how the site looks.
+- Keep it simple for editors: when you add a field, give it a label and a hint in `backend/src/admin-fields.ts`; prefer a sensible default to another setting.
+- Everything in Strapi is in English (field names, labels, defaults). Only the content of the Estonian locale is in Estonian.
+- After changing a Strapi schema, run `pnpm generate-types` and commit the regenerated types.
+- Never commit `.env` files, API tokens or database dumps.
+
+## License
+
+[GNU AGPL v3](LICENSE).
