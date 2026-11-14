@@ -110,14 +110,19 @@ async function strapiFetch<T>(
 }
 
 /**
- * An uploaded file (/uploads/…) from Strapi, cached like the content that
- * links to it. Null for anything else, or if it can't be fetched.
+ * An uploaded file (/uploads/…) from Strapi. Null for anything else, or if it
+ * can't be fetched.
+ *
+ * Not kept in Next's data cache: that's in memory (isrFlushToDisk is off),
+ * shared with the rendered pages, and refuses anything over 2 MB. Only for
+ * routes that are cached themselves (force-static, like the share cards),
+ * where it's fetched once per render and the route stays static.
  */
 export async function getUpload(url: string): Promise<ArrayBuffer | null> {
   if (!url.startsWith("/uploads/")) return null;
   try {
     const response = await fetch(`${strapiUrl()}${url}`, {
-      next: { tags: [CACHE_TAG], revalidate: FALLBACK_REVALIDATE_SECONDS },
+      cache: "no-store",
     });
     return response.ok ? await response.arrayBuffer() : null;
   } catch {
