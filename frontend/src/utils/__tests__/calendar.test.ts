@@ -187,6 +187,32 @@ describe("parseCalendar", () => {
     ]);
   });
 
+  it("keeps a long-running series' latest dates, not its first", () => {
+    // Weekly since 2010: well over 500 dates before 2027.
+    const weekly = parseCalendar(
+      [
+        "BEGIN:VCALENDAR",
+        "VERSION:2.0",
+        "BEGIN:VEVENT",
+        "DTSTART:20100106T160000Z",
+        "DTEND:20100106T180000Z",
+        "RRULE:FREQ=WEEKLY",
+        "UID:weekly@google.com",
+        "SUMMARY:Weekly",
+        "END:VEVENT",
+        "END:VCALENDAR",
+        "",
+      ].join("\r\n"),
+      {
+        until: new Date("2027-01-01T00:00:00Z"),
+        feedUrl: FEED_URL,
+        language: "et",
+      },
+    );
+    expect(weekly).toHaveLength(500);
+    expect(weekly.at(-1)?.start).toBe("2026-12-30T16:00:00.000Z");
+  });
+
   it("stops at `until`", () => {
     const early = parseCalendar(ICS, {
       until: new Date("2026-09-01T00:00:00Z"),

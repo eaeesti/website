@@ -17,8 +17,19 @@ export interface CalendarEvent {
 /** The organisation's events happen in Estonia, so times are shown there. */
 export const CALENDAR_TIME_ZONE = "Europe/Tallinn";
 
-/** A repeating event without an end stops being expanded after this many. */
+/**
+ * A repeating event's occurrences kept, the latest before the window's end:
+ * a year ahead and plenty of past ones. Counted back from the end, so a
+ * series that has run for years still shows its next dates.
+ */
 const MAX_OCCURRENCES = 500;
+
+/**
+ * How many dates of one repeating event are stepped through at most, from its
+ * first. Bounds the work on an endless series that repeats very often; a
+ * weekly one would need almost 200 years to reach it.
+ */
+const MAX_STEPS = 10_000;
 
 const GOOGLE_ICAL_PREFIX = "https://calendar.google.com/calendar/ical/";
 
@@ -185,10 +196,14 @@ export function parseCalendar(
       continue;
     }
     const iterator = master.iterator();
-    for (let count = 0; count < MAX_OCCURRENCES; count++) {
+    const dates: ICAL.Time[] = [];
+    for (let step = 0; step < MAX_STEPS; step++) {
       const next = iterator.next();
       if (!next || next.toUnixTime() >= until) break;
-      const { item, startDate, endDate } = master.getOccurrenceDetails(next);
+      dates.push(next);
+    }
+    for (const date of dates.slice(-MAX_OCCURRENCES)) {
+      const { item, startDate, endDate } = master.getOccurrenceDetails(date);
       add(item, startDate, endDate);
     }
   }
