@@ -100,6 +100,41 @@ export function isInternalAddress(
   return internal.networks.check(ip, version === 4 ? "ipv4" : "ipv6");
 }
 
+/**
+ * The key to count an address under. An IPv6 address counts as its /64
+ * network: one connection usually gets a whole /64, so keyed by the full
+ * address, anyone could pick a fresh bucket for every request. IPv4 and
+ * IPv4-mapped addresses are keyed as they are.
+ */
+export function rateLimitKey(ip: string): string {
+  const address = ip.split("%")[0] ?? ip;
+  if (isIP(address) !== 6) return ip;
+  const mapped = /^::ffff:(\d+\.\d+\.\d+\.\d+)$/i.exec(address);
+  if (mapped?.[1]) return mapped[1];
+  const [head = "", tail] = address.toLowerCase().split("::");
+  const headGroups = head ? head.split(":") : [];
+  const tailGroups = tail ? tail.split(":") : [];
+  // "::" stands for as many zero groups as the address is short of eight.
+  // An IPv4 ending ("::1.2.3.4") counts as one group here instead of two,
+  // which only shifts groups after the first four.
+  const groups =
+    tail === undefined
+      ? headGroups
+      : [
+          ...headGroups,
+          ...Array.from(
+            { length: 8 - headGroups.length - tailGroups.length },
+            () => "0",
+          ),
+          ...tailGroups,
+        ];
+  const network = groups
+    .slice(0, 4)
+    .map((group) => Number.parseInt(group, 16).toString(16))
+    .join(":");
+  return `${network}::/64`;
+}
+
 // Buckets are only cleaned up when the map gets big, rather than on a timer:
 // a long-lived setInterval in a Strapi process keeps the event loop busy and
 // has to be reasoned about on shutdown, and this costs nothing until there

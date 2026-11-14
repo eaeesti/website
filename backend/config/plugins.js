@@ -33,7 +33,12 @@ module.exports = ({ env }) => ({
       providerOptions: {
         host: env("SMTP_HOST", "smtp-relay.brevo.com"),
         port: env.int("SMTP_PORT", 587),
+        // Port 587 starts unencrypted and upgrades with STARTTLS. Without
+        // requireTLS, nodemailer sends in the clear when the server doesn't
+        // offer the upgrade, which anyone in between can arrange by removing
+        // the offer: the password and every message would be readable.
         secure: false,
+        requireTLS: true,
         // Without a username, no login: a relay that knows the server by its
         // address (like Google Workspace's) still offers one, and nodemailer
         // would try it with empty credentials and fail.

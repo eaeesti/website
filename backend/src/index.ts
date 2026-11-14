@@ -229,18 +229,22 @@ async function hardenPublicAuth(strapi: Core.Strapi): Promise<void> {
 }
 
 /**
- * Per-address limits (the contact form's and the global one) are only as
- * good as ctx.request.ip, which behind nginx is nginx's own address unless
- * SERVER_PROXY is on. That failure is silent, so say so at startup.
+ * In production Strapi runs behind nginx, and without SERVER_PROXY it can't
+ * tell that requests came over HTTPS or from whom. The admin's session
+ * cookies would lose Secure, the Google login's state cookie its __Host-
+ * name, and the per-address limits (the contact form's and the global one)
+ * would see nginx's address for everyone. None of that shows, so refuse to
+ * start instead. Turn SERVER_PROXY on only where the proxy overwrites
+ * X-Forwarded-For (config/server.js).
  */
-function warnIfProxyUntrusted(strapi: Core.Strapi): void {
+function requireTrustedProxy(strapi: Core.Strapi): void {
   if (strapi.config.get("server.proxy.koa")) return;
   if (process.env.NODE_ENV !== "production") return;
-  strapi.log.warn(
-    "⚠️  SERVER_PROXY is off: every request will report the reverse proxy's " +
-      "address, so rate limits are skipped wherever that address is internal. " +
-      "Turn it on once nginx overwrites X-Forwarded-For with the real client " +
-      "address.",
+  throw new Error(
+    "SERVER_PROXY is off in production. Behind nginx, Strapi would set the " +
+      "admin's cookies without Secure and rate-limit every visitor as one. " +
+      "Set SERVER_PROXY=true, with nginx overwriting X-Forwarded-For with " +
+      "the client's address.",
   );
 }
 
@@ -279,12 +283,12 @@ export default {
   },
 
   async bootstrap({ strapi }: { strapi: Core.Strapi }) {
+    requireTrustedProxy(strapi);
     await safely(strapi, "ensureLocales", () => ensureLocales(strapi));
     await safely(strapi, "bootstrapApiToken", () => bootstrapApiToken(strapi));
     await safely(strapi, "hardenPublicAuth", () => hardenPublicAuth(strapi));
     await safely(strapi, "syncAdminFields", () => syncAdminFields(strapi));
     await safely(strapi, "syncEditorRole", () => syncEditorRole(strapi));
-    warnIfProxyUntrusted(strapi);
     warnIfInternalNetworksInvalid(strapi);
     warnIfRevalidationUnset(strapi);
 

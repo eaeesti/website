@@ -4,6 +4,7 @@ import {
   FixedWindowLimiter,
   isInternalAddress,
   parseNetworks,
+  rateLimitKey,
 } from "../rate-limiter";
 
 describe("isInternalAddress", () => {
@@ -41,6 +42,31 @@ describe("isInternalAddress", () => {
     expect(isInternalAddress("2001:db8::5", raw)).toBe(true);
     expect(isInternalAddress("172.32.1.2", raw)).toBe(false);
     expect(isInternalAddress("127.0.0.1", raw)).toBe(true);
+  });
+});
+
+describe("rateLimitKey", () => {
+  it("keys IPv6 addresses by their /64", () => {
+    expect(rateLimitKey("2a03:4000:11:17ae:24d6:2eff:fe63:41dd")).toBe(
+      "2a03:4000:11:17ae::/64",
+    );
+    expect(rateLimitKey("2a03:4000:11:17ae::1")).toBe("2a03:4000:11:17ae::/64");
+    expect(rateLimitKey("2A03:4000:0011:17AE:ffff::")).toBe(
+      "2a03:4000:11:17ae::/64",
+    );
+    expect(rateLimitKey("2001:db8::1")).toBe("2001:db8:0:0::/64");
+    expect(rateLimitKey("::1")).toBe("0:0:0:0::/64");
+    expect(rateLimitKey("fe80::1%eth0")).toBe("fe80:0:0:0::/64");
+  });
+
+  it("keys IPv4 and IPv4-mapped addresses as they are", () => {
+    expect(rateLimitKey("203.0.113.7")).toBe("203.0.113.7");
+    expect(rateLimitKey("::ffff:203.0.113.7")).toBe("203.0.113.7");
+  });
+
+  it("leaves anything else alone", () => {
+    expect(rateLimitKey("")).toBe("");
+    expect(rateLimitKey("not an address")).toBe("not an address");
   });
 });
 

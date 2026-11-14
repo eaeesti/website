@@ -9,6 +9,7 @@ import {
 import {
   FixedWindowLimiter,
   isInternalAddress,
+  rateLimitKey,
 } from "../../../utils/rate-limiter";
 
 // Every submission writes a row and sends mail through the organisation's
@@ -37,7 +38,7 @@ export default factories.createCoreController(
       // throttle the whole site at once.
       if (
         !isInternalAddress(ctx.request.ip) &&
-        !submissionsPerIp.tryConsume(ctx.request.ip)
+        !submissionsPerIp.tryConsume(rateLimitKey(ctx.request.ip))
       ) {
         // Status must be passed to send(): its default overwrites ctx.status.
         return ctx.send(

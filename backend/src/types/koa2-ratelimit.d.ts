@@ -6,6 +6,8 @@ declare module "koa2-ratelimit" {
       max?: number;
       message?: string;
       skip?: (ctx: Context) => Promise<boolean>;
+      /** The bucket a request counts against; default `global|<ip>`. */
+      keyGenerator?: (ctx: Context) => Promise<string>;
     }): Middleware;
   };
 }

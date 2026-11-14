@@ -1,5 +1,5 @@
 import { RateLimit } from "koa2-ratelimit";
-import { isInternalAddress } from "../utils/rate-limiter";
+import { isInternalAddress, rateLimitKey } from "../utils/rate-limiter";
 
 /**
  * A coarse per-address limit on everything Strapi serves.
@@ -19,4 +19,6 @@ export default () =>
     max: 1000,
     message: "Too many requests, please try again later.",
     skip: async (ctx) => isInternalAddress(ctx.request.ip),
+    // An IPv6 visitor counts as their /64 (rateLimitKey).
+    keyGenerator: async (ctx) => `global|${rateLimitKey(ctx.request.ip)}`,
   });
