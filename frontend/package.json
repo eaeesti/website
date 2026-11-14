@@ -5,7 +5,7 @@
   "description": "Next.js frontend for the Efektiivne Altruism Eesti website",
   "license": "AGPL-3.0-or-later",
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --port 3003",
     "build": "next build",
     "start": "next start",
     "type-check": "tsc --noEmit",

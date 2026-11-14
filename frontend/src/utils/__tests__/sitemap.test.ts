@@ -21,17 +21,17 @@ describe("pageSitemapEntries", () => {
       },
     ]);
     const about = {
-      et: "http://localhost:3000/meist",
-      en: "http://localhost:3000/en/about",
+      et: "http://localhost:3003/meist",
+      en: "http://localhost:3003/en/about",
     };
     expect(entries).toEqual([
       {
-        url: "http://localhost:3000/",
+        url: "http://localhost:3003/",
         lastModified: "2026-11-01",
         alternates: {
           languages: {
-            et: "http://localhost:3000/",
-            en: "http://localhost:3000/en",
+            et: "http://localhost:3003/",
+            en: "http://localhost:3003/en",
           },
         },
       },
@@ -40,14 +40,14 @@ describe("pageSitemapEntries", () => {
         lastModified: undefined,
         alternates: { languages: about },
       },
-      { url: "http://localhost:3000/uritused", lastModified: undefined },
+      { url: "http://localhost:3003/uritused", lastModified: undefined },
       {
-        url: "http://localhost:3000/en",
+        url: "http://localhost:3003/en",
         lastModified: undefined,
         alternates: {
           languages: {
-            et: "http://localhost:3000/",
-            en: "http://localhost:3000/en",
+            et: "http://localhost:3003/",
+            en: "http://localhost:3003/en",
           },
         },
       },

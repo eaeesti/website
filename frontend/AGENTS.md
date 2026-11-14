@@ -13,7 +13,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 Next.js 16 (App Router) + TypeScript + Tailwind CSS 4. Source in `src/`.
 
 ```bash
-pnpm dev        # dev server on port 3000
+pnpm dev        # dev server on port 3003
 pnpm build      # production build (standalone output)
 pnpm type-check
 pnpm test       # Vitest: src/utils/__tests__

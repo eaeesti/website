@@ -151,9 +151,9 @@ async function bootstrapApiToken(strapi: Core.Strapi): Promise<void> {
   } else {
     const lines = [
       newLine,
-      "STRAPI_URL=http://127.0.0.1:1337",
-      "NEXT_PUBLIC_STRAPI_URL=http://localhost:1337",
-      "NEXT_PUBLIC_SITE_URL=http://localhost:3000",
+      "STRAPI_URL=http://127.0.0.1:1338",
+      "NEXT_PUBLIC_STRAPI_URL=http://localhost:1338",
+      "NEXT_PUBLIC_SITE_URL=http://localhost:3003",
       `REVALIDATE_SECRET=${process.env.REVALIDATE_SECRET ?? ""}`,
       `PREVIEW_SECRET=${process.env.PREVIEW_SECRET ?? ""}`,
       "PLAUSIBLE_DOMAIN=",

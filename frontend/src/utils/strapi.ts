@@ -25,7 +25,7 @@ export const CACHE_TAG = "strapi";
 const FALLBACK_REVALIDATE_SECONDS = 60 * 60;
 
 function strapiUrl(): string {
-  return process.env.STRAPI_URL || "http://127.0.0.1:1337";
+  return process.env.STRAPI_URL || "http://127.0.0.1:1338";
 }
 
 interface FetchOptions {

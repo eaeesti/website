@@ -33,7 +33,7 @@ pnpm dev
 
 On its first start Strapi creates the Estonian and English locales and a read-only API token for the frontend, and writes `frontend/.env` with that token and the shared secrets.
 
-5\. Open http://localhost:1337/admin and create your admin account.
+5\. Open http://localhost:1338/admin and create your admin account.
 
 6\. Optionally, import the old site's content. Both scripts need a full-access API token: in Strapi, go to Settings → API Tokens → Create new API Token, type "Full access".
 
@@ -45,7 +45,7 @@ STRAPI_TOKEN=... pnpm import:webflow  # every blog post, with images, categories
 
 They read the public site, keep a copy of each page in `backend/scripts/.webflow-cache`, and skip anything that already exists, so they are safe to run again. `REPLACE=1` makes `import:pages` overwrite pages instead, and `ONLY=/meist,/en/about` limits it to some of them. Pass `STRAPI_URL=...` to point either at another Strapi, such as production.
 
-The site is at http://localhost:3000.
+The site is at http://localhost:3003.
 
 ## How it works
 
@@ -98,7 +98,7 @@ Google login activates it.
 
 Google login is on when `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` are set in the backend, from an OAuth client of
 type "Web application" in Google Cloud. Its authorised redirect URI is `PUBLIC_URL` followed by `/google-login/callback`,
-e.g. `https://strapi.efektiivnealtruism.org/google-login/callback`, or `http://localhost:1337/google-login/callback` for
+e.g. `https://strapi.efektiivnealtruism.org/google-login/callback`, or `http://localhost:1338/google-login/callback` for
 local development. `GOOGLE_WORKSPACE_DOMAIN` names the Workspace and defaults to `efektiivnealtruism.org`.
 
 While it's on, passwords are turned off for everyone: the login page shows only the Google button, and the admin's

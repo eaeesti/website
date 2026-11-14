@@ -4,7 +4,7 @@ import { EMBED_ORIGINS } from "./src/utils/embed";
 import { strapiPublicUrl } from "./src/utils/url";
 
 // Where the Next.js server reaches Strapi (loopback in production).
-const strapiUrl = process.env.STRAPI_URL || "http://127.0.0.1:1337";
+const strapiUrl = process.env.STRAPI_URL || "http://127.0.0.1:1338";
 
 // Where browsers reach Strapi: the contact form posts there, and the content
 // manager on that origin frames the site for previews.

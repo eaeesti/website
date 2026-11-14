@@ -2,7 +2,7 @@
 
 The organisation's website. Monorepo: Strapi 5 backend (`backend/`) and Next.js 16 frontend (`frontend/`). See [README.md](README.md) for setup and how publishing works.
 
-Ports: Strapi **1337**, Next.js **3000**.
+Ports in development: Strapi **1338**, Next.js **3003** (other local projects use 1337 and 3000–3002). Production containers keep 1337 and 3000.
 
 ```bash
 pnpm install          # pnpm workspace: one lockfile for both apps

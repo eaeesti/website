@@ -12,8 +12,8 @@ function frontendOrigins(env) {
   return [
     "https://efektiivnealtruism.org",
     "https://www.efektiivnealtruism.org",
-    env("FRONTEND_URL", "http://localhost:3000"),
-    "http://localhost:3000",
+    env("FRONTEND_URL", "http://localhost:3003"),
+    "http://localhost:3003",
     ...extra,
   ];
 }

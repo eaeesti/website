@@ -13,7 +13,7 @@ const PREVIEW_PATHS = {
 };
 
 module.exports = ({ env }) => {
-  const frontendUrl = env("FRONTEND_URL", "http://localhost:3000");
+  const frontendUrl = env("FRONTEND_URL", "http://localhost:3003");
 
   return {
     auth: {
