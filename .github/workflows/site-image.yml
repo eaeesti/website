@@ -1,0 +1,86 @@
+# Checks the repo, then builds the site's image (deploy/site.Dockerfile) and
+# publishes it as ghcr.io/<owner>/website-site, tagged with the commit and as
+# "main", on every push to main that changes it. The build never contacts
+# Strapi, and its settings are public addresses.
+# The server notices the new "main" image and deploys it; nothing here
+# connects to the server, so the repository holds no deploy secrets.
+# Never on pull requests, whose workflows run code from outside.
+# Actions are pinned to commit shas; the comment says which release.
+name: Site image
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "frontend/**"
+      - "deploy/site.Dockerfile"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
+      - ".dockerignore"
+      - ".github/workflows/site-image.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: site-image
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+
+      # pnpm at the version package.json's packageManager pins
+      - run: corepack enable && corepack install
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm format:check
+      - run: pnpm type-check
+      - run: pnpm test
+
+  image:
+    needs: check
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+
+      - uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: .
+          file: deploy/site.Dockerfile
+          platforms: linux/amd64
+          push: true
+          # Inlined into the build: where browsers reach the site and Strapi,
+          # and where the /uploads proxy goes. All public addresses.
+          build-args: |
+            NEXT_PUBLIC_SITE_URL=https://efektiivnealtruism.org
+            NEXT_PUBLIC_STRAPI_URL=https://strapi.efektiivnealtruism.org
+            STRAPI_URL=https://strapi.efektiivnealtruism.org
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/website-site:${{ github.sha }}
+            ghcr.io/${{ github.repository_owner }}/website-site:main
+          # Which commit an image is, for whoever runs it.
+          labels: org.opencontainers.image.revision=${{ github.sha }}
+          cache-from: type=gha,scope=site
+          cache-to: type=gha,scope=site,mode=max

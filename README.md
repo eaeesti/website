@@ -131,7 +131,7 @@ Uploaded files are stored in `backend/public/uploads`, so back that directory up
 
 In production, view the frontend's API token in Strapi under Settings → API Tokens. This requires `ENCRYPTION_KEY` to be set.
 
-Deploying is done by the maintainers. Changes reach the live site only after one of them deploys them.
+Every push to `main` deploys itself. GitHub Actions checks the repository, builds the image of each app that changed (`.github/workflows/strapi-image.yml`, `site-image.yml`) and publishes it to GitHub's container registry as `ghcr.io/eaeesti/website-strapi` or `ghcr.io/eaeesti/website-site`. The server notices the new image within a minute and switches to it without downtime, keeping the old version running if the new one doesn't start. GitHub never connects to the server, so this repository holds no deploy secrets. Changes to `main` therefore go live: work on a branch and merge only what's ready.
 
 ## Tests, linting and formatting
 
