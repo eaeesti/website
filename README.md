@@ -106,6 +106,12 @@ password routes refuse all requests, however the address is written (Strapi's ro
 slash). If Google login ever breaks, remove the two settings and restart Strapi to log in with a password again. Strapi's own SSO needs its Enterprise plan, so this is the project's own code:
 `backend/src/middlewares/google-login.ts`, and the login page's button in `backend/src/admin/google-login.ts`.
 
+Locally, leave `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` out of `backend/.env`: Google login stays off and the
+admin asks for an email and password as Strapi normally does. After copying production's database to your machine, the
+users are production's, who log in with Google there and have no password you know; give yours one in the local
+database (a bcrypt hash in `admin_users.password`, as Strapi makes them) or use "Forgot your password?" if email is set
+up locally.
+
 ### Production
 
 Both apps run as Docker images built from `deploy/strapi.Dockerfile` and `deploy/site.Dockerfile`, for linux/amd64, with the repo root as the build context. The code is compiled on the build machine's own architecture and only the dependencies are installed for the target, since compiling under emulation is very slow. Builds need more memory than the 2 GB server has (around 1.8 GB for Strapi's admin panel and 1.4 GB for Next.js), so the server only runs the images. The site's build never talks to Strapi; every page is rendered on its first visit and cached after that.
