@@ -40,7 +40,7 @@ export default function TeamSection({ title, teamMembers }: StrapiTeamSection) {
                   {member.name}
                 </h3>
                 {member.role && (
-                  <p className="text-sm text-primary-700">{member.role}</p>
+                  <p className="text-sm text-slate-600">{member.role}</p>
                 )}
                 <BlocksContent content={member.bio} className="prose-sm mt-4" />
                 {member.button && (
