@@ -1,5 +1,6 @@
 module.exports = ({ env }) => ({
   host: env("HOST", "0.0.0.0"),
+  // 1337 is what the production image listens on; development sets 1338 in .env.
   port: env.int("PORT", 1337),
   // Where people reach Strapi, for the links in its emails (password resets).
   // Unset, Strapi links to the address it listens on, like 0.0.0.0:1337.

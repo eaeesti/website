@@ -4,7 +4,7 @@
  * src/middlewares/google-login.ts.
  *
  * Google only confirms who someone is: an account of EA Estonia's Google
- * Workspace, like the CRM's login. Whether they get in is decided by
+ * Workspace. Whether they get in is decided by
  * Strapi: their address must belong to an admin user that an administrator
  * added under Settings → Users.
  */
@@ -38,7 +38,7 @@ export interface GoogleClient {
 
 /**
  * The Google OAuth client, from GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET,
- * and the Workspace from GOOGLE_WORKSPACE_DOMAIN (as in the CRM). Without
+ * and the Workspace from GOOGLE_WORKSPACE_DOMAIN. Without
  * the client, Google login is off and passwords work.
  */
 export function googleClient(
@@ -110,7 +110,7 @@ export function verifierForState(
 /**
  * The address in an ID token, if it's a verified address of the Workspace.
  *
- * Both the `hd` claim and the address must name the domain, as in the CRM:
+ * Both the `hd` claim and the address must name the domain:
  * a personal Google account can carry any address, but only the Workspace
  * that owns a domain can put it in `hd`.
  *

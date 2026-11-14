@@ -17,10 +17,10 @@ config/
 └── plugins.js        # local uploads, SMTP email
 src/
 ├── index.ts          # bootstrap: locales, frontend API token, auth hardening,
-│                     # admin labels, revalidation middleware, PM2 ready signal,
-│                     # graceful shutdown
+│                     # admin labels, revalidation middleware, graceful shutdown
 ├── admin-fields.ts   # labels and help texts editors see in the admin
-├── admin/app.tsx     # admin branding: logos, EA blue, login texts (favicon: ../favicon.png)
+├── editor-role.ts    # the Editor role's permissions, rebuilt on every start
+├── admin/app.tsx     # admin branding: logos, EA blue, login texts (favicon: backend/favicon.png)
 ├── admin/google-login.ts # the login page's "Log in with Google" button
 ├── api/              # content types (schema.json) + controllers/routes/services
 ├── components/       # section, element and meta components

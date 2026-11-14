@@ -19,7 +19,7 @@ They're written for AI coding assistants as much as for people, so they're short
 
 ## Setup
 
-You need Node 20 or newer, [pnpm](https://pnpm.io/) and Postgres. The repo is a pnpm workspace pinned to pnpm 12 (`packageManager` in `package.json`); an older pnpm switches to that version by itself.
+You need Node 22 or newer (production runs 24), [pnpm](https://pnpm.io/) and Postgres 16 or newer. The repo is a pnpm workspace pinned to pnpm 12 (`packageManager` in `package.json`); pnpm 9.7 or newer switches to that version by itself, or run `corepack enable` first. On a Mac, `brew install node pnpm postgresql@17` and `brew services start postgresql@17` cover it.
 
 1\. Install everything:
 
@@ -33,7 +33,7 @@ pnpm install
 createdb efektiivnealtruism
 ```
 
-3\. Create `backend/.env` from `backend/.env.example` and fill it in. Generate the keys with `openssl rand -base64 16` (`APP_KEYS` takes four, comma-separated) and the two shared secrets with `openssl rand -hex 32`. The email settings can stay empty locally; contact form messages are still saved.
+3\. Create `backend/.env` from `backend/.env.example` and fill it in. Generate the keys with `openssl rand -base64 16` (`APP_KEYS` takes four, comma-separated) and the two shared secrets with `openssl rand -hex 32`. For a Homebrew Postgres, the database user is your macOS username, with no password. The email settings can stay empty locally; contact form messages are still saved.
 
 4\. Start both apps:
 
@@ -49,7 +49,7 @@ The site is at http://localhost:3003. Development uses ports 1338 and 3003 so it
 
 ### Content to work with
 
-A new database is empty, so every page of the site is a 404 until there's content. Either create a page in Strapi with the slug `/` (the home page) and add sections to it, or ask a maintainer for a copy of the live site's content: a database dump without contact form messages or login sessions, and the `backend/public/uploads` folder. After loading a copy, create yourself an admin account or set a password as described under [Logging in to the admin](#logging-in-to-the-admin), then regenerate the "Public API Token" under Settings → API Tokens and put the new key in `frontend/.env` as `STRAPI_API_TOKEN` (the copy's token was made with another server's keys).
+A new database is empty, so every page of the site is a 404 until there's content. Either create a page in Strapi with the slug `/` (the home page) and add sections to it, or ask a maintainer for a copy of the live site's content: a database dump without contact form messages or login sessions, and the `backend/public/uploads` folder. Load the dump with `psql -d efektiivnealtruism -f <file>.sql` into an empty database, and put the files in `backend/public/uploads`. Then create yourself an admin account or set a password as described under [Logging in to the admin](#logging-in-to-the-admin), then regenerate the "Public API Token" under Settings → API Tokens and put the new key in `frontend/.env` as `STRAPI_API_TOKEN` (the copy's token was made with another server's keys).
 
 The scripts in `backend/scripts/` (`pnpm import:pages`, `pnpm import:webflow`) moved the content over from the old Webflow site in 2026. That site is gone, so they're kept only as a record of how the content was converted.
 
@@ -144,7 +144,7 @@ pnpm lint          # oxlint
 pnpm format:check  # oxfmt; `pnpm format` fixes
 ```
 
-All four should pass before a change is merged.
+All four should pass before a change is merged; GitHub Actions runs them on every pull request (`.github/workflows/ci.yml`).
 
 ## Contributing
 
@@ -154,6 +154,8 @@ All four should pass before a change is merged.
 - After changing a Strapi schema, run `pnpm generate-types` and commit the regenerated types.
 - Never commit `.env` files, API tokens or database dumps.
 
+Questions, bugs and ideas go in [GitHub issues](https://github.com/eaeesti/website/issues), or write to info@efektiivnealtruism.org. Please report security problems by email rather than in a public issue.
+
 ## License
 
-[GNU AGPL v3](LICENSE).
+© MTÜ Efektiivne Altruism Eesti. The code is licensed under the [GNU Affero General Public License v3.0 or later](LICENSE). The site's content (texts, photos, blog posts) lives in Strapi, not in this repository.

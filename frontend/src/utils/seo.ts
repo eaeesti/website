@@ -113,7 +113,7 @@ export function buildPageMetadata(
 
 /**
  * Who runs the site, for search engines (schema.org), on the home page: its
- * name, address, logo, email and social media accounts. "<" is escaped so no
+ * name, website, logo, email and social media accounts. "<" is escaped so no
  * value can close the script tag.
  */
 export function organizationJsonLd(global: StrapiGlobal | null): string {

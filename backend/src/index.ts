@@ -15,8 +15,8 @@ import {
 
 /**
  * How long destroy() lets requests already in progress finish. It has to stay
- * below kill_timeout in ecosystem.config.js (5 s), after which PM2 kills the
- * process.
+ * below the time whatever runs Strapi waits before killing it (Docker's stop
+ * timeout is 10 s by default).
  */
 const SHUTDOWN_DRAIN_MS = 4000;
 
@@ -310,14 +310,15 @@ export default {
       afterDelete: () => scheduleFrontendRevalidation(strapi),
     });
 
-    // Tell PM2 this process accepts connections (`wait_ready` in the
-    // ecosystem config). It has to be the server's own `listening` event:
-    // Strapi calls listen() after bootstrap returns.
+    // Under a process manager that waits to be told (PM2's `wait_ready`),
+    // say this process accepts connections. Only then is process.send there.
+    // It has to be the server's own `listening` event: Strapi calls listen()
+    // after bootstrap returns.
     if (process.send) {
       const { httpServer } = strapi.server;
       const signalReady = () => {
         process.send?.("ready");
-        strapi.log.info("✅ PM2 ready signal sent - accepting connections");
+        strapi.log.info("✅ Ready signal sent - accepting connections");
       };
       if (httpServer.listening) signalReady();
       else httpServer.once("listening", signalReady);

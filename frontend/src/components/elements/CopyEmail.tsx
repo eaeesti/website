@@ -7,7 +7,8 @@ import { useUiText } from "./UiText";
 /**
  * An email address that copies itself when clicked and says so, instead of
  * a mailto: link, which often opens a mail app people don't use. The page
- * only contains the address with "[ät]" in place of "@" (see Email.tsx).
+ * shows the address with "[ät]" in place of "@" (see Email.tsx); the
+ * address itself is in the page's data, for the copy.
  */
 export default function CopyEmail({
   address,

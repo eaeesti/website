@@ -6,7 +6,7 @@ import { BlockList, isIP } from "node:net";
  * Deliberately not backed by Redis or the database: every caller here is
  * guarding something cheap (an outbound email, a password check), the counts
  * are worthless a window later, and a dependency on shared state would make a
- * failure in that store able to take down donations. The trade-offs that come
+ * failure in that store able to take down the contact form or the admin login. The trade-offs that come
  * with that choice, and that callers should size their limits around:
  *
  *  - counts reset on restart or deploy, so a limit is a speed bump rather than

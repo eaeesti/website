@@ -2,14 +2,14 @@
 
 The organisation's website. Monorepo: Strapi 5 backend (`backend/`) and Next.js 16 frontend (`frontend/`). See [README.md](README.md) for setup and how publishing works.
 
-Ports in development: Strapi **1338**, Next.js **3003** (other local projects use 1337 and 3000–3002). Production containers keep 1337 and 3000.
+Ports in development: Strapi **1338**, Next.js **3003**. The production containers use 1337 and 3000.
 
 ```bash
 pnpm install          # pnpm workspace: one lockfile for both apps
 pnpm dev              # both, from the repo root
 pnpm generate-types   # after changing any Strapi schema
 pnpm lint             # oxlint
-pnpm format           # oxfmt (pnpm format:check in CI)
+pnpm format           # oxfmt (pnpm format:check runs in CI)
 pnpm test && pnpm type-check
 ```
 
@@ -17,9 +17,9 @@ See [backend/AGENTS.md](backend/AGENTS.md) and [frontend/AGENTS.md](frontend/AGE
 
 ## Constraints
 
-- Production is a single 2 GB VPS running Strapi (one process), Next.js (one process) and Postgres. Builds happen in CI, never on the server.
+- Production is a single 2 GB VPS running Strapi (one process), Next.js (one process) and Postgres. The Docker images are built elsewhere, never on the server.
 - Editors are non-technical volunteers. Anything they touch in Strapi should be hard to break: fixed sections rather than free layout, clear names, sensible defaults.
-- App data that isn't website content (e.g. a future volunteer CRM) belongs in its own tables with a purpose-built admin, not in Strapi content types.
+- App data that isn't website content (e.g. a volunteer CRM) belongs in its own tables with a purpose-built admin, not in Strapi content types.
 - Everything in Strapi is in English (display names, descriptions, field defaults); volunteers speak English. Only content in the Estonian locale is in Estonian.
 - The old site's URLs (`/blogi/…`, `/rubriik/…`) are kept on purpose.
 

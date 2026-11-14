@@ -1,7 +1,7 @@
 /**
  * An email address as text, with the "@" written as "[ät]" (or "[at]" on
  * English pages; see globals.css), so the address doesn't appear as such in
- * the page's text. Links keep the real address in their mailto: href.
+ * the page's text.
  */
 export default function Email({ address }: { address: string }) {
   const [local, domain] = address.split("@");
