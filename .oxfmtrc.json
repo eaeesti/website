@@ -9,6 +9,7 @@
     "backend/types/generated/**",
     "frontend/src/types/generated/**",
     "backend/public/**",
+    "e2e/.state/**",
     "frontend/public/js/plausible-*-[0-9]*.js",
     "frontend/public/js/umami-[0-9]*.js"
   ]

@@ -23,6 +23,9 @@ module.exports = ({ env }) => ({
   app: {
     keys: env.array("APP_KEYS"),
   },
+  // Uploads go in public/uploads. The end-to-end tests point this elsewhere,
+  // so their files stay out of yours.
+  dirs: { public: env("PUBLIC_DIR", "./public") },
   webhooks: {
     populateRelations: env.bool("WEBHOOKS_POPULATE_RELATIONS", false),
   },

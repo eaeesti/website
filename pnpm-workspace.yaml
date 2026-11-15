@@ -1,6 +1,7 @@
 packages:
   - backend
   - frontend
+  - e2e
 
 # Security patches for dependencies Strapi pins to vulnerable versions.
 overrides:
