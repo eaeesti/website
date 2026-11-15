@@ -41,6 +41,13 @@ const contentSecurityPolicy = [
   `frame-ancestors 'self' ${strapiPublicOrigin}`,
 ].join("; ");
 
+/** A request whose Accept header names Markdown. */
+const ACCEPTS_MARKDOWN = {
+  type: "header" as const,
+  key: "accept",
+  value: ".*text/markdown.*",
+};
+
 const securityHeaders = [
   { key: "Content-Security-Policy", value: contentSecurityPolicy },
   { key: "X-Content-Type-Options", value: "nosniff" },
@@ -100,6 +107,23 @@ const nextConfig: NextConfig = {
         source: "/uploads/:path*",
         destination: `${strapiUrl}/uploads/:path*`,
       },
+      // The same, at the page's own address, for programs that ask for
+      // Markdown (Accept: text/markdown); browsers never do. Not for assets,
+      // the API, the routes below or anything with a file extension. The
+      // Markdown says Vary: Accept; Next keeps its own Vary on the HTML, which
+      // matters only to a shared cache, and none sits in front of the site.
+      ...[
+        { source: "/", destination: "/md/et" },
+        { source: "/en", destination: "/md/en" },
+        { source: "/en/:path([^.]*)", destination: "/md/en/:path" },
+        { source: "/blogi/:slug([^./]+)", destination: "/md/blogi/:slug" },
+        { source: "/rubriik/:slug([^./]+)", destination: "/md/rubriik/:slug" },
+        {
+          source:
+            "/:path((?!(?:_next|api|og|md|uploads|en)(?:/|$)|(?:blogi|rubriik)/)[^.]*)",
+          destination: "/md/et/:path",
+        },
+      ].map((rule) => ({ ...rule, has: [ACCEPTS_MARKDOWN] })),
       // Each page's Markdown version, for AI agents: its address with .md
       // added, index.md for a home page (markdownPath() in utils/markdown.ts).
       { source: "/index.md", destination: "/md/et" },

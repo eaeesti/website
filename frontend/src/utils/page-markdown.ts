@@ -115,6 +115,8 @@ export function markdownResponse(markdown: string, path: string): Response {
   return new Response(markdown, {
     headers: {
       "Content-Type": "text/markdown; charset=utf-8",
+      // Also the answer at the page's own address to Accept: text/markdown.
+      Vary: "Accept",
       // Search engines should list the page itself, not this copy.
       Link: `<${siteUrl(path)}>; rel="canonical"`,
     },
@@ -660,7 +662,9 @@ export async function llmsTxt(
     "The website of Efektiivne Altruism Eesti (Effective Altruism Estonia). " +
       "It's in Estonian, and some pages are also in English. Every page has " +
       "a Markdown version at its address with `.md` added (`/index.md` and " +
-      "`/en/index.md` for the home pages); the links below go to those.",
+      "`/en/index.md` for the home pages), and any page's own address gives " +
+      "Markdown to a request with `Accept: text/markdown`. The links below " +
+      "go to the Markdown versions.",
     [
       footer?.email && `Contact: ${inlineText(footer.email, english)}`,
       ...socialMediaLinks(footer?.socialMediaLinks ?? []),
