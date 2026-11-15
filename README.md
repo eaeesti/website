@@ -126,10 +126,10 @@ slash). If Google login ever breaks, remove the two settings and restart Strapi 
 `backend/src/middlewares/google-login.ts`, and the login page's button in `backend/src/admin/google-login.ts`.
 
 Locally, leave `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` out of `backend/.env`: Google login stays off and the
-admin asks for an email and password as Strapi normally does. After copying production's database to your machine, the
-users are production's, who log in with Google there and have no password you know; give yours one in the local
-database (a bcrypt hash in `admin_users.password`, as Strapi makes them) or use "Forgot your password?" if email is set
-up locally.
+admin asks for an email and password as Strapi normally does. A content snapshot has no accounts, so after loading one
+the admin asks you to register, and the first account is a Super Admin. (A full copy of production's database, which
+only maintainers ever need, has production's users instead, who have no password you know: give yours one in the local
+database, as a bcrypt hash in `admin_users.password`.)
 
 ### Production
 
