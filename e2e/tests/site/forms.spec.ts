@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import type { Page } from "@playwright/test";
 import {
   donationFrom,
   uniqueEmail,
@@ -6,6 +7,13 @@ import {
 } from "../../helpers/fakes.ts";
 import { TEAM_EMAIL } from "../../stack/config.ts";
 import { TEXT } from "../../stack/content.ts";
+
+/**
+ * One of the form's choices (frequency, amount, bank), by its button's
+ * label: a group's hidden legend can carry the same words.
+ */
+const choice = (page: Page, text: string) =>
+  page.locator("label").filter({ hasText: text });
 
 /** A valid Estonian personal ID code, made up. */
 const ID_CODE = "39001010000";
@@ -59,14 +67,14 @@ test("a monthly donation from another bank shows how to set it up", async ({
 }) => {
   const email = uniqueEmail("monthly");
   await page.goto("/anneta");
-  await page.getByText("Igakuine annetus").click();
-  await page.getByText("Muu summa").click();
+  await choice(page, "Igakuine annetus").click();
+  await choice(page, "Muu summa").click();
   await page.getByLabel("Summa (EUR)").fill("12,50");
   await page.getByLabel("Eesnimi").fill("Kuu");
   await page.getByLabel("Perekonnanimi").fill("Toetaja");
   await page.getByLabel("E-post").fill(email);
   await page.getByLabel("Isikukood").fill(ID_CODE);
-  await page.getByText("Muu pank").click();
+  await choice(page, "Muu pank").click();
   await page.getByRole("button", { name: TEXT.donateSubmit }).click();
 
   await expect(page.getByText(TEXT.otherBankText)).toBeVisible();

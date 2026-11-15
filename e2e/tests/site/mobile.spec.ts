@@ -4,11 +4,14 @@ import { TEXT } from "../../stack/content.ts";
 
 test("on a phone, the menu opens and leads to its pages", async ({ page }) => {
   await page.goto("/");
-  const menu = page.getByRole("dialog");
-  await clickToOpen(page.getByRole("button", { name: "Ava menüü" }), menu);
-  await menu.getByRole("link", { name: "Kontakt" }).click();
+  // The dialog's own element has no size: what shows is the panel in it.
+  const contact = page.getByRole("dialog").getByRole("link", {
+    name: "Kontakt",
+  });
+  await clickToOpen(page.getByRole("button", { name: "Ava menüü" }), contact);
+  await contact.click();
   await expect(
-    page.getByRole("heading", { name: TEXT.contactTitle }),
+    page.getByRole("heading", { name: TEXT.contactTitle, exact: true }),
   ).toBeVisible();
-  await expect(menu).toBeHidden();
+  await expect(contact).toBeHidden();
 });
