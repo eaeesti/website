@@ -74,7 +74,7 @@ test("a monthly donation from another bank shows how to set it up", async ({
   await page.getByLabel("Perekonnanimi").fill("Toetaja");
   await page.getByLabel("E-post").fill(email);
   await page.getByLabel("Isikukood").fill(ID_CODE);
-  await choice(page, "Muu pank").click();
+  await page.getByLabel("Pank").selectOption({ label: "Muu pank" });
   await page.getByRole("button", { name: TEXT.donateSubmit }).click();
 
   await expect(page.getByText(TEXT.otherBankText)).toBeVisible();
