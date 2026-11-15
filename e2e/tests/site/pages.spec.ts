@@ -1,6 +1,11 @@
 import { expect, test } from "@playwright/test";
 import { clickToOpen, watchErrors } from "../../helpers/page.ts";
 import { TEXT } from "../../stack/content.ts";
+import type { Locator } from "@playwright/test";
+
+/** A post in a list, by its link: its title also begins its excerpt. */
+const post = (list: Locator, index: number) =>
+  list.getByRole("link", { name: TEXT.postTitles[index], exact: true }).first();
 
 test.describe("every page", () => {
   const pages: [string, string][] = [
@@ -39,7 +44,9 @@ test("the home page shows each of its sections", async ({ page }) => {
   const main = page.getByRole("main");
   await expect(main.getByText(TEXT.heroSubtitle)).toBeVisible();
   await expect(main.getByRole("link", { name: TEXT.heroButton })).toBeVisible();
-  await expect(main.getByText(TEXT.cardTitle)).toBeVisible();
+  await expect(
+    main.getByRole("heading", { name: TEXT.cardTitle }),
+  ).toBeVisible();
   await expect(main.getByText(TEXT.testimonialText)).toBeVisible();
   await expect(main.getByText(TEXT.partnerText)).toBeVisible();
   await expect(main.getByRole("link", { name: TEXT.ctaButton })).toBeVisible();
@@ -47,9 +54,9 @@ test("the home page shows each of its sections", async ({ page }) => {
   await expect(
     main.getByRole("heading", { name: TEXT.latestPostsTitle }),
   ).toBeVisible();
-  await expect(main.getByText(TEXT.postTitles[2])).toBeVisible();
-  await expect(main.getByText(TEXT.postTitles[1])).toBeVisible();
-  await expect(main.getByText(TEXT.postTitles[0])).toHaveCount(0);
+  await expect(post(main, 2)).toBeVisible();
+  await expect(post(main, 1)).toBeVisible();
+  await expect(post(main, 0)).toHaveCount(0);
   await expect(
     main.getByRole("link", { name: TEXT.allPostsButton }),
   ).toBeVisible();
@@ -109,18 +116,18 @@ test("the blog lists posts a page at a time, and by category", async ({
 }) => {
   await page.goto("/blogi");
   const main = page.getByRole("main");
-  await expect(main.getByText(TEXT.postTitles[2])).toBeVisible();
-  await expect(main.getByText(TEXT.postTitles[0])).toHaveCount(0);
+  await expect(post(main, 2)).toBeVisible();
+  await expect(post(main, 0)).toHaveCount(0);
   await page
     .getByRole("navigation", { name: "Pagination" })
     .getByRole("link", { name: "2" })
     .click();
   await page.waitForURL("**/blogi/lk/2");
-  await expect(main.getByText(TEXT.postTitles[0])).toBeVisible();
+  await expect(post(main, 0)).toBeVisible();
 
   await page.goto("/rubriik/karjaar");
-  await expect(main.getByText(TEXT.postTitles[1])).toBeVisible();
-  await expect(main.getByText(TEXT.postTitles[2])).toHaveCount(0);
+  await expect(post(main, 1)).toBeVisible();
+  await expect(post(main, 2)).toHaveCount(0);
 });
 
 test("a blog post shows its body and author", async ({ page }) => {
@@ -181,12 +188,12 @@ test("the navigation bar, its menus and the language switch lead to their pages"
   );
   await page.getByRole("link", { name: "Üritused" }).click();
   await expect(
-    page.getByRole("heading", { name: TEXT.eventsTitle }),
+    page.getByRole("heading", { name: TEXT.eventsTitle, exact: true }),
   ).toBeVisible();
 
   await nav.getByRole("link", { name: "Meist" }).click();
   await expect(
-    page.getByRole("heading", { name: TEXT.aboutTitle }),
+    page.getByRole("heading", { name: TEXT.aboutTitle, exact: true }),
   ).toBeVisible();
   await page.getByRole("link", { name: "In English" }).first().click();
   await page.waitForURL("**/en/about");
