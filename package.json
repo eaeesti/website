@@ -8,6 +8,7 @@
     "dev": "pnpm --recursive --parallel dev",
     "generate-types": "node scripts/generate-strapi-types.mjs",
     "test": "pnpm --recursive test",
+    "test:e2e": "pnpm --filter efektiivnealtruism-e2e e2e",
     "type-check": "pnpm --recursive type-check",
     "lint": "oxlint",
     "format": "oxfmt",

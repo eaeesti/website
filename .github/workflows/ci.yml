@@ -1,4 +1,5 @@
-# Lint, formatting, types and tests on every pull request and push to main.
+# Lint, formatting, types and unit tests, and the end-to-end tests, on every
+# pull request and push to main.
 # Actions are pinned to commit shas; the comment says which release.
 name: CI
 
@@ -9,6 +10,12 @@ on:
 
 permissions:
   contents: read
+
+# A new push to the same pull request cancels the run for the older commit.
+# Pushes to main each run to the end.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   check:
@@ -28,3 +35,53 @@ jobs:
       - run: pnpm format:check
       - run: pnpm type-check
       - run: pnpm test
+
+  # The end-to-end tests (e2e/): Strapi and the site, built as in production,
+  # against a Postgres made for the run, with stand-ins for email, the
+  # donation API and the calendar and podcast feeds. Nothing here has secrets
+  # or connects anywhere else.
+  e2e:
+    name: end-to-end tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: strapi
+          POSTGRES_PASSWORD: strapi
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    # The tests make their own database on it.
+    env:
+      PGHOST: 127.0.0.1
+      PGPORT: 5432
+      PGUSER: strapi
+      PGPASSWORD: strapi
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+
+      - run: corepack enable && corepack install
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+        working-directory: e2e
+      - run: pnpm test:e2e
+
+      # What failed, with a trace of each failure, for `playwright show-report`.
+      - if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: e2e-report
+          path: |
+            e2e/.state/report
+            e2e/.state/test-results
+          retention-days: 14

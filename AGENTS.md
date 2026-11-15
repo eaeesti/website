@@ -11,9 +11,10 @@ pnpm generate-types   # after changing any Strapi schema
 pnpm lint             # oxlint
 pnpm format           # oxfmt (pnpm format:check runs in CI)
 pnpm test && pnpm type-check
+pnpm test:e2e         # Playwright, e2e/: builds and runs both apps; CI runs it
 ```
 
-See [backend/AGENTS.md](backend/AGENTS.md) and [frontend/AGENTS.md](frontend/AGENTS.md) for each app.
+See [backend/AGENTS.md](backend/AGENTS.md) and [frontend/AGENTS.md](frontend/AGENTS.md) for each app, and [e2e/README.md](e2e/README.md) for the end-to-end tests. They take minutes and need `pnpm dev` stopped (they build into `backend/dist`), so leave them to CI unless asked: push a branch and read the `e2e` job.
 
 Setting up a new machine: follow README.md's Setup. Content comes from a content snapshot a maintainer provides (`cd backend && pnpm snapshot:load <file>`); ask for its path rather than creating content. Don't run `snapshot:load` while Strapi is running, and never commit a snapshot.
 
@@ -32,6 +33,7 @@ Setting up a new machine: follow README.md's Setup. Content comes from a content
 3. Add its populate shape to `SECTIONS_POPULATE` in `frontend/src/utils/strapi.ts`.
 4. Create the component in `frontend/src/components/sections/` and add it to the switch in `Sections.tsx`.
 5. Add its Markdown to `sectionMarkdown()` in `frontend/src/utils/page-markdown.ts` (type-checking fails until you do).
+6. Put one on a page in `e2e/stack/content.ts` and check in `e2e/tests/site/pages.spec.ts` that it shows.
 
 ## TypeScript Conventions
 

@@ -8,6 +8,7 @@ WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY backend/package.json backend/
 COPY frontend/package.json frontend/
+COPY e2e/package.json e2e/
 RUN pnpm install --frozen-lockfile --fail-if-no-match --filter ./backend
 COPY backend backend
 ENV NODE_ENV=production
@@ -19,6 +20,7 @@ WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY backend/package.json backend/
 COPY frontend/package.json frontend/
+COPY e2e/package.json e2e/
 RUN pnpm install --frozen-lockfile --fail-if-no-match --filter ./backend
 COPY backend backend
 COPY --from=build /app/backend/dist backend/dist

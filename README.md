@@ -157,7 +157,9 @@ pnpm lint          # oxlint
 pnpm format:check  # oxfmt; `pnpm format` fixes
 ```
 
-All four should pass before a change is merged; GitHub Actions runs them on every pull request (`.github/workflows/ci.yml`).
+All four should pass before a change is merged. GitHub Actions runs them, and the end-to-end tests, on every pull request and every push to `main` (`.github/workflows/ci.yml`).
+
+The end-to-end tests ([e2e/](e2e/README.md)) use the site in a browser the way visitors do: every page and section, the contact form and its email, a donation, the Markdown versions, a change published in Strapi reaching the site, and Strapi's admin. They build both apps and run them against a database of their own with made-up content, so they take a few minutes; CI is the usual place to run them. To run them yourself, see [e2e/README.md](e2e/README.md).
 
 ## Contributing
 

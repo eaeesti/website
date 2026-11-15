@@ -9,6 +9,7 @@ WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY backend/package.json backend/
 COPY frontend/package.json frontend/
+COPY e2e/package.json e2e/
 RUN pnpm install --frozen-lockfile --fail-if-no-match --filter ./frontend
 COPY frontend frontend
 # Inlined at build time: where browsers reach the site and Strapi, and where
@@ -34,6 +35,7 @@ WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY backend/package.json backend/
 COPY frontend/package.json frontend/
+COPY e2e/package.json e2e/
 RUN pnpm install --frozen-lockfile --prod --fail-if-no-match --filter ./frontend
 COPY frontend frontend
 COPY --from=build /app/frontend/.next frontend/.next
