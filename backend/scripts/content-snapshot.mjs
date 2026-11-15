@@ -149,7 +149,7 @@ function postgresEnvironment() {
  * fails. `input`, a chain of streams, is streamed to it.
  */
 function run(command, args, { input } = {}) {
-  return new Promise((resolve, reject) => {
+  return new Promise((succeed, fail) => {
     const child = spawn(command, args, {
       env: postgresEnvironment(),
       stdio: [input ? "pipe" : "ignore", "pipe", "inherit"],
@@ -165,13 +165,13 @@ function run(command, args, { input } = {}) {
       () => null,
       (error) => error,
     );
-    child.on("error", reject);
+    child.on("error", fail);
     child.on("close", (code) => {
       streamed.then((error) => {
         if (code !== 0) {
-          reject(new Error(`${command} failed (exit code ${code})`));
-        } else if (error) reject(error);
-        else resolve(printed.trim());
+          fail(new Error(`${command} failed (exit code ${code})`));
+        } else if (error) fail(error);
+        else succeed(printed.trim());
       });
     });
   });
