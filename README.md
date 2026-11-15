@@ -27,29 +27,44 @@ You need Node 22 or newer (production runs 24), [pnpm](https://pnpm.io/) and Pos
 pnpm install
 ```
 
-2\. Create a database:
+2\. Create `backend/.env` from `backend/.env.example` and fill it in. Generate the keys with `openssl rand -base64 16` (`APP_KEYS` takes four, comma-separated) and the two shared secrets with `openssl rand -hex 32`. For a Homebrew Postgres, the database user is your macOS username, with no password. The email settings can stay empty locally; contact form messages are still saved. With real ones, Strapi really sends the emails it makes.
+
+3\. Create the database, with the site's content in it. Ask a maintainer for a content snapshot: a copy of the live site's content without anything private (no contact form messages, accounts or keys), with its images and other uploaded files. Then:
 
 ```sh
-createdb efektiivnealtruism
+cd backend
+pnpm snapshot:load ~/Downloads/content-snapshot-….tar.gz
 ```
 
-3\. Create `backend/.env` from `backend/.env.example` and fill it in. Generate the keys with `openssl rand -base64 16` (`APP_KEYS` takes four, comma-separated) and the two shared secrets with `openssl rand -hex 32`. For a Homebrew Postgres, the database user is your macOS username, with no password. The email settings can stay empty locally; contact form messages are still saved.
+This creates the database and copies the files into `backend/public/uploads`. If the database already exists, it's kept under another name. Run it again whenever you want newer content; stop Strapi first.
 
-4\. Start both apps:
+To start without content instead, run `createdb efektiivnealtruism` (or whatever `DATABASE_NAME` says). Every page is then a 404 until you create a page with the slug `/` (the home page) and add sections to it.
+
+4\. Start both apps from the repository's root:
 
 ```sh
 pnpm dev
 ```
 
-On its first start Strapi creates the Estonian and English locales and a read-only API token for the frontend, and writes `frontend/.env` with that token and the shared secrets.
+On its first start Strapi creates the Estonian and English locales and a read-only API token for the site, and writes it into `frontend/.env` (creating the file, with the shared secrets, if needed).
 
-5\. Open http://localhost:1338/admin and create your admin account. Locally you log in with an email and password; Google login is only for production (see [Logging in to the admin](#logging-in-to-the-admin)).
+5\. Open http://localhost:1338/admin and register. The first account is a Super Admin. Locally you log in with an email and password; Google login is only for production (see [Logging in to the admin](#logging-in-to-the-admin)).
 
 The site is at http://localhost:3003. Development uses ports 1338 and 3003 so it can run next to other projects on the usual 1337 and 3000.
 
-### Content to work with
+If you use an AI coding assistant such as Claude Code, it can do these steps for you: the AGENTS.md files describe the project for it. Give it the snapshot's path.
 
-A new database is empty, so every page of the site is a 404 until there's content. Either create a page in Strapi with the slug `/` (the home page) and add sections to it, or ask a maintainer for a copy of the live site's content: a database dump without contact form messages or login sessions, and the `backend/public/uploads` folder. Load the dump with `psql -d efektiivnealtruism -f <file>.sql` into an empty database, and put the files in `backend/public/uploads`. Then create yourself an admin account or set a password as described under [Logging in to the admin](#logging-in-to-the-admin), then regenerate the "Public API Token" under Settings → API Tokens and put the new key in `frontend/.env` as `STRAPI_API_TOKEN` (the copy's token was made with another server's keys).
+### Making a content snapshot
+
+For maintainers. In `backend`:
+
+```sh
+pnpm snapshot:make
+```
+
+This makes one from your own database and `backend/public/uploads`, so the content is as new as your copy of it. To make one from production's content instead, give it a plain-SQL dump of the production database, made with `pg_dump --no-owner --no-privileges` (gzipped or not), after copying production's uploads into `backend/public/uploads`: `pnpm snapshot:make <dump.sql.gz>`.
+
+Either way it loads the content into a scratch database next to yours, removes what's private, checks that it's gone, and writes `content-snapshot-<date>.tar.gz` in the repository's root (ignored by git). What it removes is listed at the top of `backend/scripts/content-snapshot.mjs`. Delete a production dump afterwards, and share the snapshot only with people working on the site: it includes drafts that aren't published yet, and the team's public email addresses.
 
 ## How it works
 

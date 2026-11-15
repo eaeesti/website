@@ -15,6 +15,8 @@ pnpm test && pnpm type-check
 
 See [backend/AGENTS.md](backend/AGENTS.md) and [frontend/AGENTS.md](frontend/AGENTS.md) for each app.
 
+Setting up a new machine: follow README.md's Setup. Content comes from a content snapshot a maintainer provides (`cd backend && pnpm snapshot:load <file>`); ask for its path rather than creating content. Don't run `snapshot:load` while Strapi is running, and never commit a snapshot.
+
 ## Constraints
 
 - Production is a single 2 GB VPS running Strapi (one process), Next.js (one process) and Postgres. The Docker images are built elsewhere, never on the server.

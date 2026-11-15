@@ -13,6 +13,7 @@
     "dist/",
     ".cache/",
     ".tmp/",
+    "scripts/",
     "src/admin/",
     "**/*.test.ts",
     "vitest.config.mts"

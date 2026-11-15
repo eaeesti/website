@@ -12,7 +12,9 @@
     "strapi": "strapi",
     "test": "vitest run",
     "test:watch": "vitest",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "snapshot:make": "node --env-file=.env scripts/content-snapshot.mjs make",
+    "snapshot:load": "node --env-file=.env scripts/content-snapshot.mjs load"
   },
   "dependencies": {
     "@strapi/plugin-users-permissions": "5.62.0",

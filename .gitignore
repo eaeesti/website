@@ -122,3 +122,9 @@ build
 
 .next
 frontend/.next
+
+############################
+# Content snapshots (backend/scripts/content-snapshot.mjs): unpublished drafts
+############################
+
+content-snapshot-*
